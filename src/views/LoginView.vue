@@ -27,8 +27,8 @@
               />
             </n-form-item>
             <n-button
-              block=true
-              bordered=false
+              :block= true
+              :bordered= false
               :color=style.colors.yellow
               text-color='#000000'
               @click='handleValidateClick'
@@ -54,8 +54,9 @@
 // @ is an alias to /src
 // import ModalLogin from '@/components/ModalLogin.vue'
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+// import { useRouter } from 'vue-router'
 import { mapState } from 'vuex'
+import { useMessage } from 'naive-ui'
 
 export default {
   name: 'LoginView',
@@ -63,18 +64,45 @@ export default {
     // ModalLogin
   },
   setup () {
+    const message = useMessage()
     const formRef = ref(null)
-    const router = useRouter()
+    const formValue = ref({
+      login: '',
+      password: ''
+    })
+    const rules = ref({
+      login: {
+        required: true,
+        message: 'Это поле обязательно для ввода',
+        trigger: ['input', 'blur']
+      },
+      password: {
+        required: true,
+        message: 'Это поле обязательно для ввода',
+        trigger: ['input', 'blur']
+      }
+    })
+    // const router = useRouter()
+    function checkUser (data) {
+      console.log('login: ' + data.value.login + ', password: ' + data.value.password)
+      return false
+    }
     return {
       formRef,
+      formValue,
+      rules,
       handleValidateClick (e) {
         e.preventDefault()
         formRef.value?.validate((errors) => {
           if (errors) {
             console.log(errors)
           } else {
-            console.log('hello')
-            router.push({ path: '/' })
+            if (checkUser(formValue)) {
+              console.log('hello')
+            // router.push({ path: '/' })
+            } else {
+              message.error('Такого пользователя не существует')
+            }
           }
         })
       }
@@ -82,22 +110,6 @@ export default {
   },
   data () {
     return {
-      formValue: {
-        login: '',
-        password: ''
-      },
-      rules: {
-        login: {
-          required: true,
-          message: 'Это поле обязательно для ввода',
-          trigger: ['input', 'blur']
-        },
-        password: {
-          required: true,
-          message: 'Это поле обязательно для ввода',
-          trigger: ['input', 'blur']
-        }
-      }
     }
   },
   methods: {
