@@ -9,8 +9,8 @@ export default createStore({
       }
     },
     user: {
-      name: 'Ivan',
-      group: 'IT-191'
+      name: '',
+      group: ''
     }
   },
   getters: {
@@ -18,7 +18,7 @@ export default createStore({
   mutations: {
     updateUser (state, user) {
       state.user.name = user.name
-      state.user.id = user.id
+      state.user.type = user.type
       state.user.group = user.group
     }
   },

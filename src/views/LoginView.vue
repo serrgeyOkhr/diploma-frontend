@@ -6,12 +6,12 @@
         <div class="placeForText">
           <h1>СГУВТ код</h1>
           <div class="description">
-            <span>Этот сервис...</span>
+            <span>Этот сервис... АЦТОЙ! школа для тупых!!</span>
           </div>
         </div>
         <div class="loginForm">
           <n-form ref="formRef" :rules="rules" :model="formValue" action="#">
-            <n-form-item label='Логин' path='login'>
+            <n-form-item label="Логин" path='login'>
               <n-input
                 v-model:value="formValue.login"
                 placeholder='Введите Логин'
@@ -54,8 +54,8 @@
 // @ is an alias to /src
 // import ModalLogin from '@/components/ModalLogin.vue'
 import { ref } from 'vue'
-// import { useRouter } from 'vue-router'
-import { mapState } from 'vuex'
+import { useRouter } from 'vue-router'
+import { mapState, useStore } from 'vuex'
 import { useMessage } from 'naive-ui'
 
 export default {
@@ -65,6 +65,8 @@ export default {
   },
   setup () {
     const message = useMessage()
+    const store = useStore()
+    const router = useRouter()
     const formRef = ref(null)
     const formValue = ref({
       login: '',
@@ -82,10 +84,28 @@ export default {
         trigger: ['input', 'blur']
       }
     })
-    // const router = useRouter()
     function checkUser (data) {
-      console.log('login: ' + data.value.login + ', password: ' + data.value.password)
-      return false
+      const dataToServer = {
+        login: data.value.login,
+        password: data.value.password
+      }
+      console.log(dataToServer)
+      const Result = {
+        response: 200,
+        // user: {
+        //   name: 'Антон Денисович',
+        //   type: 2,
+        //   group: undefined
+        // }
+        user: {
+          name: 'Сергей Вячеславович',
+          type: 1,
+          group: 'ИТ-181'
+        }
+      }
+      store.commit('updateUser', Result.user)
+      localStorage.setItem('User', JSON.stringify(store.state.user))
+      return Result
     }
     return {
       formRef,
@@ -97,9 +117,11 @@ export default {
           if (errors) {
             console.log(errors)
           } else {
-            if (checkUser(formValue)) {
+            const rez = checkUser(formValue)
+            if (rez.response === 200) {
+              message.info('Здравствуй, ' + rez.user.name)
               console.log('hello')
-            // router.push({ path: '/' })
+              router.push({ path: '/' })
             } else {
               message.error('Такого пользователя не существует')
             }

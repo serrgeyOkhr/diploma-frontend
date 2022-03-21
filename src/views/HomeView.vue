@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from 'vuex'
+import { mapMutations, mapState, useStore } from 'vuex'
 // @ is an alias to /src
 // import ModalLogin from '@/components/ModalLogin.vue'
 // const testUser = {
@@ -35,25 +35,35 @@ export default {
   methods: {
     ...mapMutations({
       updateUser: 'updateUser'
-    }),
-    getUser (id) {
-    }
+    })
   },
-  created () {
-    // console.log(testUser)
-    const serverUser = {
-      name: 'Sergey',
-      id: 1221,
-      group: 'it-181'
-    }
-    this.updateUser(serverUser)
-    console.log(this.user)
-    console.log(this.style)
-  },
+  // created () {
+  //   // console.log(testUser)
+  //   const serverUser = {
+  //     name: 'Sergey',
+  //     id: 1221,
+  //     group: 'it-181'
+  //   }
+  //   this.updateUser(serverUser)
+  //   console.log(this.user)
+  //   console.log(this.style)
+  // },
   setup () {
-    // const store = useStore()
-    // console.log(store.colors)
+    const store = useStore()
+
+    function setData (data) {
+      store.commit('updateUser', data)
+    }
+
+    if (!localStorage.getItem('User')) {
+      localStorage.setItem('User', JSON.stringify(store.state.user))
+    } else {
+      setData(JSON.parse(localStorage.getItem('User')))
+    }
+    console.log(JSON.parse(localStorage.getItem('User')))
+    console.log(store.state.user)
     console.log('setUp')
+    // localStorage.setItem('User', JSON.stringify(store.state.user))
   }
 }
 
