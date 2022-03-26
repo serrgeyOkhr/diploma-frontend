@@ -107,6 +107,7 @@ export default {
       localStorage.setItem('User', JSON.stringify(store.state.user))
       return Result
     }
+
     return {
       formRef,
       formValue,

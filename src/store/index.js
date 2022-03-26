@@ -11,7 +11,16 @@ export default createStore({
     user: {
       name: '',
       group: ''
-    }
+    },
+    tasks: [{
+      id: 12,
+      deadline: '05.10.2022',
+      subject: 'Предмет 1',
+      name: 'Поиск цифр в строке',
+      description: 'В этом задании требуется найти все цифры в заданной строке. Функция должна вернуть строку цифр',
+      published: true,
+      group: 'ИТ-181'
+    }]
   },
   getters: {
   },
@@ -20,6 +29,16 @@ export default createStore({
       state.user.name = user.name
       state.user.type = user.type
       state.user.group = user.group
+    },
+    updateTasks (state, data) {
+      state.tasks = []
+      data.forEach(element => {
+        state.tasks.push(element)
+      })
+    },
+    changeTaskPublished (state, data) {
+      const task = state.tasks.filter((task) => { return task.id === data.id })
+      task[0].published = data.published
     }
   },
   actions: {
