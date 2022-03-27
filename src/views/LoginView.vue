@@ -104,7 +104,7 @@ export default {
         }
       }
       store.commit('updateUser', Result.user)
-      localStorage.setItem('User', JSON.stringify(store.state.user))
+      // localStorage.setItem('User', JSON.stringify(store.state.user))
       return Result
     }
 

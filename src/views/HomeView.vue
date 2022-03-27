@@ -1,38 +1,6 @@
 <template>
   <div class="home">
-    <header class="header">
-      <nav class="navigation">
-          <n-button
-          :class="['testButton', 'btn', {handle_active: showSubject === 'all'}]" @click='setTasks("all")'
-          :color=this.style.colors.yellow
-          ghost
-          text-color='#000000'
-          >Показать все</n-button>
-          <n-button
-          :class="['testButton', 'btn', {handle_active: showSubject === subject}]"
-          :color=this.style.colors.yellow
-          text-color='#000000'
-          ghost
-          v-for='(subject, index) in subjects'
-          :key='index'
-          @click='setTasks(subject)'
-          >{{subject}}</n-button>
-      </nav>
-      <div class="header_group">
-        <span>
-          {{this.user.name}}
-        </span>
-        <span>
-          {{this.user.group}}
-        </span>
-        <n-button
-        class='exitButton btn'
-        ghost
-        :color=this.style.colors.purple
-        text-color='#000000'
-        >Выход</n-button>
-      </div>
-    </header>
+    <Header @setTasks="setTasks" :subjects='subjects' :showSubject='showSubject'/>
     <div class="container">
       <div class="taskBar" v-for='(group, index) in groups' :key='index'>
         <TaskCom
@@ -43,6 +11,7 @@
         :description="task.description"
         :published="task.published"
         :done="task.done"
+        @click="openTask(task.id, task)"
         />
         <!-- <h2 class=group_header v-if='groups.size >= 1'> {{task}} </h2> -->
         <!-- <div class="task_item" v-for='(task, index) in showTask' :key='index'>{{task.name}}</div> -->
@@ -57,6 +26,9 @@
 import { ref } from '@vue/reactivity'
 import { mapMutations, mapState, useStore } from 'vuex'
 import TaskCom from '../components/Task.vue'
+import Header from '../components/Header.vue'
+import { useRouter } from 'vue-router'
+
 // @ is an alias to /src
 // import ModalLogin from '@/components/ModalLogin.vue'
 // const testUser = {
@@ -66,7 +38,8 @@ import TaskCom from '../components/Task.vue'
 export default {
   name: 'HomeView',
   components: {
-    TaskCom
+    TaskCom,
+    Header
   },
   data () {
     return {
@@ -112,6 +85,7 @@ export default {
   // },
   setup () {
     const store = useStore()
+    const router = useRouter()
     const user = ref(store.state.user)
     const style = ref(store.state.style)
 
@@ -250,6 +224,11 @@ export default {
       return tasks
     }
 
+    function openTask (taskId, task) {
+      console.log(taskId)
+      router.push({ name: 'task', params: { id: taskId, task: task } })
+    }
+
     if (!localStorage.getItem('User')) {
       localStorage.setItem('User', JSON.stringify(store.state.user))
     } else {
@@ -275,7 +254,8 @@ export default {
       tasks,
       groups,
       user,
-      style
+      style,
+      openTask
     }
   }
 }
@@ -283,25 +263,11 @@ export default {
 </script>
 
 <style scoped>
-.header{
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px solid #000000;
-  font-size: 18px;
-}
-.btn{
+.btn {
   font-size: 18px;
   padding: 10px 20px;
 }
-.header_group{
-  display: flex;
-  align-items: center;
-  margin-right: 20px;
-}
-.header_group span{
-  font-size: 18px;
-  margin-right: 40px;
-}
+
 .container {
   display: flex;
   justify-content: space-between;
@@ -332,10 +298,6 @@ export default {
   width: 70%;
   justify-content: center;
   align-items: center;
-}
-.handle_active{
-  background-color: #F8D57E !important;
-  color:black
 }
 .n-button:hover{
   color:black

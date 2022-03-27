@@ -1,12 +1,18 @@
 <template>
   <n-message-provider>
-    <!-- <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </nav> -->
     <router-view/>
   </n-message-provider>
 </template>
+
+<script>
+// import HeaderView from './components/Header.vue'
+
+export default {
+  components: {
+    // HeaderView
+  }
+}
+</script>
 
 <style>
 #app {
