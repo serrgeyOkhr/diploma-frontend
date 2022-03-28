@@ -101,7 +101,22 @@ export default {
         name: 'Поиск цифр в строке',
         description: 'В этом задании требуется найти корни квадратного уравнения. Функция должна необходимое число корней, или "нет корней. В этом задании требуется найти корни квадратного уравнения. В этом задании требуется найти корни квадратного уравнения.',
         published: true,
-        group: 'ИТ-181'
+        group: 'ИТ-181',
+        examples: [
+          {
+            input: 5,
+            outputs: [25]
+          },
+          {
+            input: 'ab',
+            outputs: ['aba', 'bab']
+          },
+          {
+            input: [[2, 6, 4], [4, -1, 8]],
+            outputs: [[1, 4], [4, 1]]
+          }
+
+        ]
       },
       {
         id: 2,
@@ -276,7 +291,9 @@ export default {
   width: 30%;
   display: flex;
   flex-direction: column;
-  padding: 0 20px;
+  align-items: center;
+  padding: 0 15px;
+  flex-shrink: 0;
   border: 1px solid #fff;
   border-right-color: black;
   max-height: calc(100vh - 100px);
@@ -284,6 +301,9 @@ export default {
   overflow: auto;
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
+}
+.statsBar{
+  width: 70%;
 }
 .taskBar::-webkit-scrollbar {
   display: none;
