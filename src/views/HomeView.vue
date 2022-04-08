@@ -11,11 +11,11 @@
         :description="task.description"
         :published="task.published"
         :done="task.done"
-        @click="openTask(task.id, task)"
+        @openPage="openTask(task.id, task)"
         />
         <!-- <h2 class=group_header v-if='groups.size >= 1'> {{task}} </h2> -->
         <!-- <div class="task_item" v-for='(task, index) in showTask' :key='index'>{{task.name}}</div> -->
-        <n-button v-if='user.type === 2' class='addTask' @click='logStore()' :color=this.style.colors.purple>show store</n-button>
+        <n-button v-if='user.type === 2' class='addTask' @click='createTask()' :color=this.style.colors.purple>Добавить задание</n-button>
       </div>
       <div class="statsBar"> <span>content</span></div>
     </div>
@@ -72,31 +72,32 @@ export default {
       console.log('state: ', this.state_tasks)
     }
   },
-  // created () {
-  //   // console.log(testUser)
-  //   const serverUser = {
-  //     name: 'Sergey',
-  //     id: 1221,
-  //     group: 'it-181'
-  //   }
-  //   this.updateUser(serverUser)
-  //   console.log(this.user)
-  //   console.log(this.style)
-  // },
   setup () {
     const store = useStore()
     const router = useRouter()
     const user = ref(store.state.user)
     const style = ref(store.state.style)
+    const tasks = getTasks()
+    const subjects = new Set()
+    const groups = new Set()
 
     function setData (place, data) {
       store.commit(place, data)
     }
 
+    tasks.forEach(element => {
+      subjects.add(element.subject)
+      groups.add(element.group)
+    })
+
+    function createTask () {
+      router.push({ name: 'changeTask' })
+    }
+
     function getTasks () {
       const tasks = [{
         id: 1,
-        deadline: '05.10.2022',
+        deadline: '2022,05,15',
         subject: 'Предмет 1',
         name: 'Поиск цифр в строке',
         description: 'В этом задании требуется найти корни квадратного уравнения. Функция должна необходимое число корней, или "нет корней. В этом задании требуется найти корни квадратного уравнения. В этом задании требуется найти корни квадратного уравнения.',
@@ -246,22 +247,15 @@ export default {
 
     if (!localStorage.getItem('User')) {
       localStorage.setItem('User', JSON.stringify(store.state.user))
+      setData('createTasks', tasks)
     } else {
       setData('updateUser', JSON.parse(localStorage.getItem('User')))
-      setData('updateTasks', getTasks())
+      setData('createTasks', tasks)
     }
     console.log(JSON.parse(localStorage.getItem('User')))
     console.log(store.state.user)
     // console.log(store.state.tasks)
 
-    const tasks = store.state.tasks
-    const subjects = new Set()
-    const groups = new Set()
-
-    tasks.forEach(element => {
-      subjects.add(element.subject)
-      groups.add(element.group)
-    })
     console.log('setUp')
     // localStorage.setItem('User', JSON.stringify(store.state.user))
     return {
@@ -270,7 +264,8 @@ export default {
       groups,
       user,
       style,
-      openTask
+      openTask,
+      createTask
     }
   }
 }

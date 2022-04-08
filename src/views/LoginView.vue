@@ -92,16 +92,16 @@ export default {
       console.log(dataToServer)
       const Result = {
         response: 200,
-        // user: {
-        //   name: 'Антон Денисович',
-        //   type: 2,
-        //   group: undefined
-        // }
         user: {
-          name: 'Сергей Вячеславович',
-          type: 1,
-          group: 'ИТ-181'
+          name: 'Антон Денисович',
+          type: 2,
+          group: undefined
         }
+        // user: {
+        //   name: 'Сергей Вячеславович',
+        //   type: 1,
+        //   group: 'ИТ-181'
+        // }
       }
       store.commit('updateUser', Result.user)
       // localStorage.setItem('User', JSON.stringify(store.state.user))

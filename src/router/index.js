@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
 import TaskView from '../views/TaskView.vue'
+import ChangeTaskView from '../views/ChangeTaskView.vue'
 
 const routes = [
   {
@@ -18,6 +19,16 @@ const routes = [
     path: '/task/:id',
     name: 'task',
     component: TaskView
+  },
+  {
+    path: '/change_task/:id',
+    name: 'changeTaskID',
+    component: ChangeTaskView
+  },
+  {
+    path: '/change_task/new',
+    name: 'changeTask',
+    component: ChangeTaskView
   },
   {
     path: '/about',

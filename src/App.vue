@@ -27,7 +27,7 @@ export default {
       Select: {
         peers: {
           InternalSelection: {
-            textColor: '#FF0000'
+            textColor: '#000000'
           }
         }
       }

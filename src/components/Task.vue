@@ -1,6 +1,6 @@
 <template>
   <div class="container" :class="{already_done: done}">
-    <div class="task_text">
+    <div class="task_text" @click="$emit('openPage')">
       <h4 class="task_title"> {{title}}</h4>
       <p class="description"> {{trimDescription}} </p>
     </div>
@@ -86,6 +86,7 @@ export default {
 .task_text{
   display: flex;
   flex-direction: column;
+  cursor: pointer;
   text-align: left;
 }
 .task_title{

@@ -1,38 +1,93 @@
+/* eslint-disable no-useless-escape */
 <template>
-  <h1>code here</h1>
   <div class="container">
-    <n-form class="codeForm">
-      <!-- <n-form-item path="textareaValue"> -->
-        <n-input
-          class="giantTextarea"
-          placeholder="Textarea"
-          type="textarea"
-          :autosize="{
-            minRows: 20,
-            maxRows: 20
-          }"
-        />
-      <!-- </n-form-item> -->
-    </n-form>
-    <div class="results">Ответ</div>
+    <div class="selectors">
+      <n-select v-model:value="selectedLanguage" :options="listLanguages" />
+      <!-- <n-select v-model:value="value" :options="options" /> -->
+    </div>
+    <div class="codeForm">
+    <CodeEditor
+      v-model="formVal"
+      font_size="16px"
+      width="100%"
+      min_height="55vh"
+      :key="formatSelectLanguage"
+      :autofocus="true"
+      :wrap_code="true"
+      :languages="formatSelectLanguage"
+    > </CodeEditor>
+    </div>
+    <div class="results">  {{formVal}}  </div>
     <div class="takerButton">
-      <n-button>Отправить</n-button>
+      <n-space>
+        <n-button @click="getFormVal()">Проверить</n-button>
+        <n-button @click="getFormVal()">Отправить</n-button>
+      </n-space>
     </div>
   </div>
 </template>
 
 <script>
+import CodeEditor from 'simple-code-editor'
+import { ref } from '@vue/reactivity'
 export default {
-  name: 'code-taker'
+  name: 'code-taker',
+  components: {
+    CodeEditor
+  },
+  computed: {
+    formatSelectLanguage () {
+      return JSON.parse(this.selectedLanguage)
+    }
+  },
+  setup () {
+    const template = 'function main () {\n\n}\n\n\n\n\n\n\n\n\n\n\n'
+    const formVal = ref(template)
+
+    // eslint-disable-next-line no-useless-escape
+    const selectedLanguage = ref('[[\"python\",\"Python\"]]')
+    const listLanguages = [
+      {
+        label: 'JavaScript',
+        // eslint-disable-next-line no-useless-escape
+        value: '[[\"javascipt\",\"JS\"]]'
+      },
+      {
+        label: 'Python',
+        // eslint-disable-next-line no-useless-escape
+        value: '[[\"python\",\"Python\"]]'
+      },
+      {
+        label: 'C#',
+        // eslint-disable-next-line no-useless-escape
+        value: '[[\"csharp\",\"C#\"]]'
+      }
+    ]
+
+    function getFormVal () {
+      console.log('here')
+      console.log(formVal)
+      // return formVal.value.toLowerCase()
+    }
+    return {
+      formVal,
+      listLanguages,
+      selectedLanguage,
+      getFormVal
+    }
+  }
 }
 </script>
 
 <style scoped>
 .codeForm{
-  border: 1px solid;
+  /* border: 1px solid; */
+  border-radius: 15px;
   padding: 0;
   margin: 0;
-  margin-bottom: 30px;
+  max-height: 55vh;
+  overflow: auto;
+  margin-bottom: 20px;
   box-shadow: 0px 2px 4px -1px #000;
 }
 .giantTextarea{
@@ -43,13 +98,27 @@ export default {
   border: 1px solid blue;
 } */
 .container{
-  width: 100%;
+  display: flex;
+  flex-direction: column;
   text-align-last: left;
-  /* background-color: #ccc; */
+  margin-right: 5px;
+}
+.selectors{
+  width: 10%;
+  margin-top: 10px;
+  margin-bottom: 15px;
 }
 .results{
-  min-height: 10vh;
+  height: 15vh;
+  overflow: auto;
+  margin-bottom: 10px;
   padding: 10px;
   border: 1px solid;
+}
+.takerButton{
+  display: flex;
+  justify-content: flex-end;
+  text-align: center;
+  /* padding-right: 10px; */
 }
 </style>

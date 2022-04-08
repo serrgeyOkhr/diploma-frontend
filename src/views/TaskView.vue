@@ -1,6 +1,6 @@
 <template>
   <Header/>
-  <div class="container">
+  <div v-if="userType === 1" class="container">
     <div class="description">
       <div class="navBar">
         <n-button @click="toggleView = true">Задание</n-button>
@@ -16,13 +16,27 @@
       <div class="resultsList" v-else>Список результатов</div>
     </div>
   </div>
+  <div v-if="userType === 2" class="container">
+    <div class="description">
+      <div class="content">
+        <!-- <TaskDescription :task=locTask /> -->
+        Придумать как это сделать
+      </div>
+      <div class="changeTaskButton">
+        <n-button @click="changeTask()">Редактировать задание</n-button>
+      </div>
+    </div>
+    <div class="expectation">
+      <div class="resultsList">Список результатов</div>
+    </div>
+  </div>
 </template>
 
 <script>
 import Header from '../components/Header.vue'
 import TaskDescription from '../components/TaskDescription.vue'
 import CodeTaker from '../components/CodeTaker.vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { ref } from '@vue/reactivity'
 export default {
@@ -34,18 +48,37 @@ export default {
   },
   setup () {
     const route = useRoute()
+    const router = useRouter()
     const store = useStore()
     const toggleView = ref(true)
-    console.log(store.state.tasks)
-    const locTask = store.state.tasks.filter((task) => {
+    const tasks = store.state.tasks
+    const userType = store.state.user.type
+    const subjects = new Set()
+    const groups = new Set()
+
+    const locTask = tasks.filter((task) => {
       // console.log(task.id)
       // console.log(route.params.id)
       return Number(task.id) === Number(route.params.id)
     })[0]
-    console.log(locTask)
+
+    tasks.forEach(element => {
+      subjects.add(element.subject)
+      groups.add(element.group)
+    })
+    console.log(subjects, groups)
+    function changeTask () {
+      // console.log(taskId)
+      router.push({ name: 'changeTaskID', params: { id: locTask.id, task: locTask } })
+    }
+
+    // console.log(locTask.id)
+    // console.log(locTask)
     return {
       locTask,
-      toggleView
+      toggleView,
+      userType,
+      changeTask
     }
   }
 }
