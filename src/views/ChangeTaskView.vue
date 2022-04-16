@@ -113,7 +113,7 @@
           <n-input type="text" v-model:value="taskValue.newField" />
        </div>
       </div>
-      <n-button @click="saveTask">Сохранить задание</n-button>
+      <n-button class="save_change_btn" @click="saveTask">Сохранить задание</n-button>
     </div>
       <div class="testCase">
         <div class="tests_wrapper">
@@ -143,19 +143,6 @@ export default {
     Header,
     Test
   },
-  methods: {
-    removeTest (id) {
-      // console.log('id = ', id)
-      // const newList = taskValue.value.examples.filter((item, index, array) => { return index !== id })
-      // console.log(typeof (this.taskValue.examples[id]))
-      // this.taskValue.examples = this.taskValue.examples.filter((item, index, array) => { return index !== id })
-      // this.taskValue.examples[id].forEach(element => {
-      //   console.log(element)
-      // })
-      // console.log('Новый массив', newList)
-      // taskValue.value.examples = newList
-    }
-  },
   setup () {
     const props = useRoute()
     const store = useStore()
@@ -175,6 +162,9 @@ export default {
       store.commit(place, data)
     }
     if (typeof (taskValue.value.deadline) === 'string') {
+      const re = /[.]+/g
+      taskValue.value.deadline = taskValue.value.deadline.replaceAll(re, ',')
+      console.log(taskValue.value.deadline)
       taskValue.value.deadline = Date.parse(taskValue.value.deadline)
     }
     function createNewTask () {
@@ -193,11 +183,15 @@ export default {
     }
 
     function saveTask () {
-      console.log('here0', tasks)
+      console.log('here0', tasks[props.params.id - 1])
     }
 
     function addTest () {
-      taskValue.value.examples.push({})
+      if (taskValue.value.examples) {
+        taskValue.value.examples.push({})
+      } else {
+        taskValue.value.examples = [{}]
+      }
     }
 
     return {
@@ -246,6 +240,9 @@ export default {
 }
 .taskDescriptionItemContainer{
   display: flex;
+}
+.save_change_btn {
+  margin-top: 10px;
 }
 .testDescriptionDynamic{
   max-width: 70%;
@@ -297,6 +294,9 @@ export default {
 .test_container{
   display: flex;
   flex-direction: column;
+}
+.tests_wrapper{
+  padding: 0 10px;
 }
 .test_wrap{
   display: flex;

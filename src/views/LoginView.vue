@@ -6,7 +6,8 @@
         <div class="placeForText">
           <h1>СГУВТ код</h1>
           <div class="description">
-            <span>Этот сервис... АЦТОЙ! школа для тупых!!</span>
+            <img src="../assets/logo_ssuwt.png" alt="logo_ssuwt">
+            <span> Сервис создан студентами для студентов </span>
           </div>
         </div>
         <div class="loginForm">
@@ -36,10 +37,10 @@
               class='button'
             > Войти</n-button>
           </n-form>
-      <pre>
+      <!-- <pre>
         login: {{formValue.login}}
         password: {{formValue.password}}
-      </pre>
+      </pre> -->
         </div>
       </div>
     </div>
@@ -92,16 +93,16 @@ export default {
       console.log(dataToServer)
       const Result = {
         response: 200,
-        user: {
-          name: 'Антон Денисович',
-          type: 2,
-          group: undefined
-        }
         // user: {
-        //   name: 'Сергей Вячеславович',
-        //   type: 1,
-        //   group: 'ИТ-181'
+        //   name: 'Антон Денисович',
+        //   type: 2,
+        //   group: undefined
         // }
+        user: {
+          name: 'Сергей Вячеславович',
+          type: 1,
+          group: 'ИТ-181'
+        }
       }
       store.commit('updateUser', Result.user)
       // localStorage.setItem('User', JSON.stringify(store.state.user))
@@ -172,9 +173,14 @@ export default {
   font-size: 64px;
 }
 .description{
+  display: flex;
+  flex-direction: column;
   font-size: 18px;
   line-height: 32px;
   margin-top: 30px;
+}
+.description img{
+    width: 300px;
 }
 .loginForm{
   min-width: 320px;

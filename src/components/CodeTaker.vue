@@ -17,11 +17,18 @@
       :languages="formatSelectLanguage"
     > </CodeEditor>
     </div>
-    <div class="results">  {{formVal}}  </div>
+    <div class="results" v-if="customError">
+      <!-- <pre> {{resp}} </pre> -->
+      <Response :key='resp' :data='customError' />
+    </div>
+    <div class="results" v-else>
+      <!-- <pre> {{resp}} </pre> -->
+      <Response :key='resp' :data='resp' />
+    </div>
     <div class="takerButton">
       <n-space>
-        <n-button @click="getFormVal()">Проверить</n-button>
-        <n-button @click="getFormVal()">Отправить</n-button>
+        <!-- <n-button @click="getFormVal()">Проверить</n-button> -->
+        <n-button :loading="loading" @click="getFormVal()">Отправить</n-button>
       </n-space>
     </div>
   </div>
@@ -29,28 +36,45 @@
 
 <script>
 import CodeEditor from 'simple-code-editor'
-import { ref } from '@vue/reactivity'
+import Response from '../components/Response.vue'
+import { ref, toRaw } from '@vue/reactivity'
 export default {
   name: 'code-taker',
   components: {
-    CodeEditor
+    CodeEditor,
+    Response
   },
   computed: {
     formatSelectLanguage () {
       return JSON.parse(this.selectedLanguage)
     }
   },
-  setup () {
-    const template = 'function main () {\n\n}\n\n\n\n\n\n\n\n\n\n\n'
-    const formVal = ref(template)
-
+  props: {
+    id: {
+      type: Number
+    },
+    task: {
+      type: Object
+    }
+  },
+  setup (props) {
+    const template = ref(null)
+    if (props.id === 2) {
+      template.value = 'def my_function(arr):\n    for i in range(len(arr)):\n        for j in range(len(arr) - 1):\n            if arr[j] > arr[j+1]:\n                arr[j], arr[j+1] = arr[j+1], arr[j]\n    return arr\n'
+    } else {
+      template.value = 'def my_function(n):\n    return n ** 2\n'
+    }
+    const formVal = template
+    const resp = ref(null)
+    const customError = ref(null)
+    const loading = ref(null)
     // eslint-disable-next-line no-useless-escape
     const selectedLanguage = ref('[[\"python\",\"Python\"]]')
     const listLanguages = [
       {
         label: 'JavaScript',
         // eslint-disable-next-line no-useless-escape
-        value: '[[\"javascipt\",\"JS\"]]'
+        value: '[[\"javascript\",\"JS\"]]'
       },
       {
         label: 'Python',
@@ -67,13 +91,60 @@ export default {
     function getFormVal () {
       console.log('here')
       console.log(formVal)
+      sendSolution(formVal)
       // return formVal.value.toLowerCase()
     }
+    function getTests () {
+      const tests = props.task.examples
+      console.log('body.spec.tests', toRaw(tests))
+      return toRaw(tests)
+    }
+
+    function sendSolution (data) {
+      console.log('daTA', data)
+      const body = {
+        id: 'square',
+        spec: {
+          language: 'python',
+          code: data.value,
+          tests: getTests()
+        }
+      }
+      const serverUrl = 'http://127.0.0.1:5000/run_code'
+      console.log(body)
+      loading.value = true
+      fetch(serverUrl, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(body)
+      })
+        .then(async (response) => { resp.value = await response.json() })
+        .then((response) => { loading.value = false })
+        .catch((error) => {
+          customError.value = error
+          setTimeout(() => { loading.value = false }, 1000)
+        })
+    }
+    // {"id":"square","status":"done","output":"{\"success\":true,\"output\":\"\"}"} - good one
+
+    // {"id":"square","status":"done","output":"{\"success\":false,\"output\":\"\",\"failed_test\":5}"} - not pass test
+
+    // {"id":"square","status":"done","output":"{\"success\":false,\"output\":\"Traceback (most recent call last):\\n  File \\\"/mnt/userfs/program.py\\\", line 16, in \\u003cmodule\\u003e\\n    output = my_function(test)\\n  File \\\"/mnt/userfs/program.py\\\", line 8, in my_function\\n    raise Exception(\\\"bad\\\")\\nException: bad\\n\",\"failed_test\":5}"} - ошибка ??
+
+    //  {"id":"square","status":"timeout","output":""} - по времени не влезли :(
+
     return {
       formVal,
       listLanguages,
       selectedLanguage,
-      getFormVal
+      resp,
+      getFormVal,
+      loading,
+      customError
     }
   }
 }
@@ -104,7 +175,7 @@ export default {
   margin-right: 5px;
 }
 .selectors{
-  width: 10%;
+  width: 150px;
   margin-top: 10px;
   margin-bottom: 15px;
 }

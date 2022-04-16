@@ -36,7 +36,7 @@
             v-model:value="outputData"
             item-style="border: 1px solid; border-radius: 5px; padding: 5px;"
             :min=1
-            :on-update="updateOutputData('outputs',outputData)">
+            :on-update="updateOutputData('output',outputData)">
               <!-- <template #default="{ value }">
                 <div style="display: flex; align-items: center; width: 100%">
                   <n-input v-model:value="value.output" type="text" />
@@ -78,7 +78,7 @@ export default {
     if (props.test) {
       // console.log(props.test.input)
       // console.log(props.taskId)
-      // console.log(props.test.outputs)
+      // console.log(props.test.output)
       const task = store.state.tasks.filter((element) => { return element.id === props.taskId })
       tests = task[0].examples
       // console.log('task', tests)
@@ -86,34 +86,40 @@ export default {
     const curTest = tests[props.index]
     if (curTest) {
       if (typeof (curTest.input) === 'object') {
-        curTest.input.forEach(element => {
-          // console.log(JSON.stringify(element))
-          inputData.value.push((element))
-        })
+        if (typeof (curTest.input[0]) === 'object') {
+          curTest.input.forEach(element => {
+            // console.log(JSON.stringify(element))
+            inputData.value.push((element))
+          })
+        } else {
+          inputData.value.push(JSON.stringify(curTest.input))
+        }
+        console.log(inputData.value)
       } else {
         inputData.value.push((curTest.input))
       }
-      if (typeof (curTest.outputs) === 'object') {
-        curTest.outputs.forEach(element => {
+      if (typeof (curTest.output) === 'object') {
+        curTest.output.forEach(element => {
           // console.log((element))
           outputData.value.push((element))
         })
       } else {
-        outputData.value.push((curTest.outputs))
+        outputData.value.push((curTest.output))
       }
     }
 
     function updateInputData (type, data) {
       const task = store.state.tasks.filter((element) => { return element.id === props.taskId })
       tests = task[0].examples
+      console.log(data)
       data = toRaw(data)
       data.forEach((el, index) => {
         if (el) {
-          // console.log(el)
+          console.log(el)
           // console.log(typeof (el))
           inputCheckForArray.value = false
 
-          if (!Number.isNaN(Number(el))) {
+          if (!Number.isNaN(Number(el)) && typeof (el) !== 'object') {
             el = JSON.parse(el)
           } else if (typeof (el) === 'object') {
             el = JSON.stringify(el)
@@ -140,7 +146,8 @@ export default {
         if (el) {
           // console.log(el)
 
-          if (!Number.isNaN(Number(el))) {
+          if (!Number.isNaN(Number(el)) && typeof (el) !== 'object') {
+            console.log(!Number.isNaN(Number(el)))
             outputCheckForArray.value = false
             el = JSON.parse(el)
           } else if (typeof (el) === 'object') {
@@ -185,10 +192,10 @@ export default {
 .test {
   font-size: 18px;
   border: 1px solid;
-  border-left: none;
+  /* border-left: none; */
   padding: 5px  10px;
   margin-bottom: 10px;
-  /* margin-top: 5px; */
+  margin-top: 5px;
 }
 .itemHealper{
   border: 1px solid;

@@ -10,7 +10,7 @@
       <span>Входные данные:</span>
       <pre> {{JSON.stringify(exam.input)}} </pre>
       <span>Выходные данные:</span>
-      <pre> {{JSON.stringify(exam.outputs)}} </pre>
+      <pre v-for='(output) in exam.output' :key="output"> {{JSON.stringify(output)}} </pre>
     </div>
   </div>
 </template>

@@ -17,7 +17,9 @@
         <!-- <div class="task_item" v-for='(task, index) in showTask' :key='index'>{{task.name}}</div> -->
         <n-button v-if='user.type === 2' class='addTask' @click='createTask()' :color=this.style.colors.purple>Добавить задание</n-button>
       </div>
-      <div class="statsBar"> <span>content</span></div>
+      <div class="statsBar">
+        <span> Статистика </span>
+      </div>
     </div>
   </div>
 </template>
@@ -99,142 +101,30 @@ export default {
         id: 1,
         deadline: '2022,05,15',
         subject: 'Предмет 1',
-        name: 'Поиск цифр в строке',
-        description: 'В этом задании требуется найти корни квадратного уравнения. Функция должна необходимое число корней, или "нет корней. В этом задании требуется найти корни квадратного уравнения. В этом задании требуется найти корни квадратного уравнения.',
+        name: 'Квадрат числа',
+        description: 'В этом задании требуется найти квадрат числа, поданного на вход',
         published: true,
         group: 'ИТ-181',
         examples: [
-          {
-            input: 5,
-            outputs: [25]
-          },
-          {
-            input: 'ab',
-            outputs: ['aba', 'bab']
-          },
-          {
-            input: [[2, 6, 4], [4, -1, 8]],
-            outputs: [[1, 4], [4, 1]]
-          }
-
-        ]
+          { input: 5, output: [25] },
+          { input: 10, output: [100] },
+          { input: 0, output: [0] }
+        ],
+        done: false
       },
       {
         id: 2,
-        deadline: '15.10.2022',
+        deadline: '10.10.2022',
         subject: 'Предмет 1',
-        name: 'Поиск символов в строке',
-        description: 'В этом задании требуется найти все буквы в заданной строке. Функция должна вернуть строку',
-        published: true,
-        group: 'ИТ-181'
-      },
-      {
-        id: 3,
-        deadline: '15.10.2022',
-        subject: 'Предмет 1',
-        name: 'Поиск символов в строке',
-        description: 'В этом задании требуется найти все буквы в заданной строке. Функция должна вернуть строку',
-        published: false,
-        group: 'ИТ-181'
-      },
-      {
-        id: 5,
-        deadline: '15.10.2022',
-        subject: 'Предмет 1',
-        name: 'Поиск символов в строке',
-        description: 'В этом задании требуется найти все буквы в заданной строке. Функция должна вернуть строку',
+        name: 'Сортировка массива',
+        description: 'В этом задании требуется отсортировать массив. На вход программы подается массив чисел, на выход отсортированный массив по возрастанию',
         published: true,
         group: 'ИТ-181',
-        done: true
-      },
-      {
-        id: 5,
-        deadline: '15.10.2022',
-        subject: 'Предмет 1',
-        name: 'Поиск символов в строке',
-        description: 'В этом задании требуется найти все буквы в заданной строке. Функция должна вернуть строку',
-        published: true,
-        group: 'ИТ-181',
-        done: true
-      },
-      {
-        id: 5,
-        deadline: '15.10.2022',
-        subject: 'Предмет 1',
-        name: 'Поиск символов в строке',
-        description: 'В этом задании требуется найти все буквы в заданной строке. Функция должна вернуть строку',
-        published: true,
-        group: 'ИТ-181',
-        done: true
-      },
-      {
-        id: 5,
-        deadline: '15.10.2022',
-        subject: 'Предмет 1',
-        name: 'Поиск символов в строке',
-        description: 'В этом задании требуется найти все буквы в заданной строке. Функция должна вернуть строку',
-        published: true,
-        group: 'ИТ-181',
-        done: true
-      },
-      {
-        id: 5,
-        deadline: '15.10.2022',
-        subject: 'Предмет 1',
-        name: 'Поиск символов в строке',
-        description: 'В этом задании требуется найти все буквы в заданной строке. Функция должна вернуть строку',
-        published: true,
-        group: 'ИТ-181',
-        done: true
-      },
-      {
-        id: 5,
-        deadline: '15.10.2022',
-        subject: 'Предмет 1',
-        name: 'Поиск символов в строке',
-        description: 'В этом задании требуется найти все буквы в заданной строке. Функция должна вернуть строку',
-        published: true,
-        group: 'ИТ-181',
-        done: true
-      },
-      {
-        id: 5,
-        deadline: '15.10.2022',
-        subject: 'Предмет 1',
-        name: 'Поиск символов в строке',
-        description: 'В этом задании требуется найти все буквы в заданной строке. Функция должна вернуть строку',
-        published: true,
-        group: 'ИТ-181',
-        done: true
-      },
-      {
-        id: 5,
-        deadline: '15.10.2022',
-        subject: 'Предмет 1',
-        name: 'Поиск символов в строке',
-        description: 'В этом задании требуется найти все буквы в заданной строке. Функция должна вернуть строку',
-        published: true,
-        group: 'ИТ-181',
-        done: true
-      },
-      {
-        id: 5,
-        deadline: '15.10.2022',
-        subject: 'Предмет 1',
-        name: 'Поиск символов в строке',
-        description: 'В этом задании требуется найти все буквы в заданной строке. Функция должна вернуть строку',
-        published: true,
-        group: 'ИТ-181',
-        done: true
-      },
-      {
-        id: 4,
-        deadline: '11.10.2022',
-        subject: 'Предмет 2',
-        name: 'решение квадратного уравнения',
-        description: 'В этом задании требуется найти корни квадратного уравнения. Функция должна необходимое число корней, или "нет корней. В этом задании требуется найти корни квадратного уравнения. В этом задании требуется найти корни квадратного уравнения."',
-        published: true,
-        group: 'ИТ-181',
+        examples: [
+          { input: [3, 1, 2, 6, 5, 4], output: [[1, 2, 3, 4, 5, 6]] },
+          { input: [1, -1, 0], output: [[-1, 0, 1]] },
+          { input: [], output: [[]] }
+        ],
         done: false
       }]
       return tasks
@@ -286,7 +176,8 @@ export default {
   width: 30%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
+  justify-content: start;
   padding: 0 15px;
   flex-shrink: 0;
   border: 1px solid #fff;

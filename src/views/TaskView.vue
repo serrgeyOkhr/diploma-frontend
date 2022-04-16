@@ -3,8 +3,8 @@
   <div v-if="userType === 1" class="container">
     <div class="description">
       <div class="navBar">
-        <n-button @click="toggleView = true">Задание</n-button>
-        <n-button @click="toggleView = false">Результаты</n-button>
+        <n-button :class="['testButton', 'btn', 'handle_active']" @click="toggleView = true">Задание</n-button>
+        <n-button :class="['testButton', 'btn']" @click="toggleView = false">Результаты</n-button>
       </div>
       <div class="content" v-if="this.toggleView">
         <TaskDescription :task=locTask />
@@ -12,7 +12,7 @@
       <div class="content" v-else>Результаты</div>
     </div>
     <div class="expectation">
-      <div class="codeTaker" v-if="this.toggleView"><CodeTaker /></div>
+      <div class="codeTaker" v-if="this.toggleView"><CodeTaker :id=locTask.id :task=locTask /></div>
       <div class="resultsList" v-else>Список результатов</div>
     </div>
   </div>
@@ -97,8 +97,8 @@ export default {
   /* margin: 0 5px; */
   padding: 0 15px;
   border-right: 1px solid;
-  max-height: calc(100vh - 115px);
-  min-height: calc(100vh - 115px);
+  max-height: calc(100vh - 100px);
+  min-height: calc(100vh - 100px);
   overflow: auto;
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
@@ -112,7 +112,16 @@ export default {
 /* .codeTaker {
   width: 75%;
 } */
+.navBar{
+  margin-top: 10px;
+}
 .description::-webkit-scrollbar {
   display: none;
+}
+.n-button:hover{
+  color:black;
+}
+.n-button:focus{
+  color:black;
 }
 </style>
