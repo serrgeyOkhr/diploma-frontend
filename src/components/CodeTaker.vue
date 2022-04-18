@@ -59,11 +59,7 @@ export default {
   },
   setup (props) {
     const template = ref(null)
-    if (props.id === 2) {
-      template.value = 'def my_function(arr):\n    for i in range(len(arr)):\n        for j in range(len(arr) - 1):\n            if arr[j] > arr[j+1]:\n                arr[j], arr[j+1] = arr[j+1], arr[j]\n    return arr\n'
-    } else {
-      template.value = 'def my_function(n):\n    return n ** 2\n'
-    }
+    template.value = 'def my_function(n):\n    return n ** 2\n'
     const formVal = template
     const resp = ref(null)
     const customError = ref(null)
@@ -129,14 +125,6 @@ export default {
           setTimeout(() => { loading.value = false }, 1000)
         })
     }
-    // {"id":"square","status":"done","output":"{\"success\":true,\"output\":\"\"}"} - good one
-
-    // {"id":"square","status":"done","output":"{\"success\":false,\"output\":\"\",\"failed_test\":5}"} - not pass test
-
-    // {"id":"square","status":"done","output":"{\"success\":false,\"output\":\"Traceback (most recent call last):\\n  File \\\"/mnt/userfs/program.py\\\", line 16, in \\u003cmodule\\u003e\\n    output = my_function(test)\\n  File \\\"/mnt/userfs/program.py\\\", line 8, in my_function\\n    raise Exception(\\\"bad\\\")\\nException: bad\\n\",\"failed_test\":5}"} - ошибка ??
-
-    //  {"id":"square","status":"timeout","output":""} - по времени не влезли :(
-
     return {
       formVal,
       listLanguages,

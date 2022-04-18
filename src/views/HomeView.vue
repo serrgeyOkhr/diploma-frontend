@@ -1,7 +1,10 @@
 <template>
   <div class="home">
     <Header @setTasks="setTasks" :subjects='subjects' :showSubject='showSubject'/>
-    <div class="container">
+    <div v-if="user.type === 69" class="container">
+      <Admin />
+    </div>
+    <div v-else class="container">
       <div class="taskBar" v-for='(group, index) in groups' :key='index'>
         <TaskCom
         v-for='(task, index) in showTask'
@@ -29,6 +32,7 @@ import { ref } from '@vue/reactivity'
 import { mapMutations, mapState, useStore } from 'vuex'
 import TaskCom from '../components/Task.vue'
 import Header from '../components/Header.vue'
+import Admin from '../components/Admin.vue'
 import { useRouter } from 'vue-router'
 
 // @ is an alias to /src
@@ -41,7 +45,8 @@ export default {
   name: 'HomeView',
   components: {
     TaskCom,
-    Header
+    Header,
+    Admin
   },
   data () {
     return {
@@ -86,48 +91,51 @@ export default {
     function setData (place, data) {
       store.commit(place, data)
     }
-
-    tasks.forEach(element => {
-      subjects.add(element.subject)
-      groups.add(element.group)
-    })
+    if (tasks) {
+      tasks.forEach(element => {
+        subjects.add(element.subject)
+        groups.add(element.group)
+      })
+    }
 
     function createTask () {
       router.push({ name: 'changeTask' })
     }
 
     function getTasks () {
-      const tasks = [{
-        id: 1,
-        deadline: '2022,05,15',
-        subject: 'Предмет 1',
-        name: 'Квадрат числа',
-        description: 'В этом задании требуется найти квадрат числа, поданного на вход',
-        published: true,
-        group: 'ИТ-181',
-        examples: [
-          { input: 5, output: [25] },
-          { input: 10, output: [100] },
-          { input: 0, output: [0] }
-        ],
-        done: false
-      },
-      {
-        id: 2,
-        deadline: '10.10.2022',
-        subject: 'Предмет 1',
-        name: 'Сортировка массива',
-        description: 'В этом задании требуется отсортировать массив. На вход программы подается массив чисел, на выход отсортированный массив по возрастанию',
-        published: true,
-        group: 'ИТ-181',
-        examples: [
-          { input: [3, 1, 2, 6, 5, 4], output: [[1, 2, 3, 4, 5, 6]] },
-          { input: [1, -1, 0], output: [[-1, 0, 1]] },
-          { input: [], output: [[]] }
-        ],
-        done: false
-      }]
-      return tasks
+      if (user.value.type !== 69) {
+        const tasks = [{
+          id: 1,
+          deadline: '2022,05,15',
+          subject: 'Предмет 1',
+          name: 'Квадрат числа',
+          description: 'В этом задании требуется найти квадрат числа, поданного на вход',
+          published: true,
+          group: 'ИТ-181',
+          examples: [
+            { input: 5, output: [25] },
+            { input: 10, output: [100] },
+            { input: 0, output: [0] }
+          ],
+          done: false
+        },
+        {
+          id: 2,
+          deadline: '10.10.2022',
+          subject: 'Предмет 1',
+          name: 'Сортировка массива',
+          description: 'В этом задании требуется отсортировать массив. На вход программы подается массив чисел, на выход отсортированный массив по возрастанию',
+          published: true,
+          group: 'ИТ-181',
+          examples: [
+            { input: [3, 1, 2, 6, 5, 4], output: [[1, 2, 3, 4, 5, 6]] },
+            { input: [1, -1, 0], output: [[-1, 0, 1]] },
+            { input: [], output: [[]] }
+          ],
+          done: false
+        }]
+        return tasks
+      }
     }
 
     function openTask (taskId, task) {

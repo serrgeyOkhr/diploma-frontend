@@ -34,9 +34,11 @@ export default createStore({
     },
     createTasks (state, data) {
       state.tasks = []
-      data.forEach(element => {
-        state.tasks.push(element)
-      })
+      if (data) {
+        data.forEach(element => {
+          state.tasks.push(element)
+        })
+      }
     },
     addNewTasks (state, data) {
       // console.log('store data', data)

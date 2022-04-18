@@ -99,10 +99,15 @@ export default {
         //   group: undefined
         // }
         user: {
-          name: 'Сергей Вячеславович',
-          type: 1,
-          group: 'ИТ-181'
+          name: 'Админ Админович',
+          type: 69,
+          group: undefined
         }
+        // user: {
+        //   name: 'Сергей Вячеславович',
+        //   type: 1,
+        //   group: 'ИТ-181'
+        // }
       }
       store.commit('updateUser', Result.user)
       // localStorage.setItem('User', JSON.stringify(store.state.user))
