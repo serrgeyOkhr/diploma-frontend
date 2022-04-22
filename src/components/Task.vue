@@ -79,6 +79,7 @@ export default {
   display: flex;
   align-items: center;
   padding: 0 10px;
+  margin: 0 10px;
   border: 1px solid #000000;
   border-radius: 5px;
   margin-top: 5px;

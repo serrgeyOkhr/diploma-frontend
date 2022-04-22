@@ -34,8 +34,8 @@ export default createStore({
     },
     createTasks (state, data) {
       state.tasks = []
-      if (data) {
-        data.forEach(element => {
+      if (data.value) {
+        data.value.forEach(element => {
           state.tasks.push(element)
         })
       }
