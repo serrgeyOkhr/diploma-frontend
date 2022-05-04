@@ -241,7 +241,6 @@ export default {
     // console.log(JSON.parse(localStorage.getItem('User')))
     // console.log(store.state.user)
     // // console.log(store.state.tasks)
-
     // console.log('setUp')
     // localStorage.setItem('User', JSON.stringify(store.state.user))
     return {

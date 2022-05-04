@@ -22,11 +22,13 @@
           <n-button class="testButton btn" :class="{handle_active: toggleView}" @click="toggleView = true">Задание</n-button>
           <n-button class="testButton btn" :class="{handle_active: !toggleView}"  @click="toggleView = false">Результаты</n-button>
           <div class="description">
-            <ResultList :id='locTask.id' />
+            <ResultList :id='locTask.id' @handler_click="hello"/>
           </div>
         </div>
       </div>
-      <div class="resultsList">Список результатов</div>
+      <div class="resultsList">
+        <DetailResult :rezId='detailTask' :key='detailTask.id'/>
+      </div>
     </div>
 
   </div>
@@ -51,6 +53,7 @@ import Header from '../components/Header.vue'
 import TaskDescription from '../components/TaskDescription.vue'
 import CodeTaker from '../components/CodeTaker.vue'
 import ResultList from '../components/ResultList.vue'
+import DetailResult from '../components/DetailRez.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { ref } from '@vue/reactivity'
@@ -60,7 +63,8 @@ export default {
     Header,
     TaskDescription,
     CodeTaker,
-    ResultList
+    ResultList,
+    DetailResult
   },
   setup () {
     const route = useRoute()
@@ -71,6 +75,7 @@ export default {
     const userType = store.state.user.type
     const subjects = new Set()
     const groups = new Set()
+    const detailTask = ref({ id: null, status: null })
 
     const locTask = tasks.filter((task) => {
       // console.log(task.id)
@@ -87,14 +92,19 @@ export default {
       // console.log(taskId)
       router.push({ name: 'changeTaskID', params: { id: locTask.id, task: locTask } })
     }
-
+    function hello (data) {
+      detailTask.value.id = data.id
+      detailTask.value.status = data.status
+    }
     // console.log(locTask.id)
     // console.log(locTask)
     return {
       locTask,
       toggleView,
       userType,
-      changeTask
+      detailTask,
+      changeTask,
+      hello
     }
   }
 }
@@ -112,6 +122,10 @@ export default {
   width: 30%;
   border-right: solid 1px;
 }
+.resultsList{
+  width: 70%;
+  padding: 0 10px;
+}
 .codeTaker{
   min-width: 70%;
   padding: 0 10px;
@@ -123,8 +137,8 @@ export default {
   text-align: left;
   /* margin: 0 5px; */
   padding: 0 15px;
-  max-height: calc(100vh - 100px);
-  min-height: calc(100vh - 100px);
+  max-height: calc(100vh - 140px);
+  min-height: calc(100vh - 140px);
   overflow: auto;
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */

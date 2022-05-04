@@ -178,8 +178,8 @@ export default {
         formRef.value?.validate((errors) => {
           if (!errors) {
             // const rez = getUser(formValue)
-            const rez = getStaticUser(formValue)
-            // const rez = getStaticProf(formValue)
+            // const rez = getStaticUser(formValue)
+            const rez = getStaticProf(formValue)
             // const rez = getStaticAdmin(formValue)
             // const rez = getStaticErrorUser(formValue)
             if (rez.response === 200) {
