@@ -54,18 +54,13 @@
 
 <script>
 /* eslint-disable no-unused-vars */
-// @ is an alias to /src
-// import ModalLogin from '@/components/ModalLogin.vue'
-import { ref, toRaw } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { mapState, useStore } from 'vuex'
 import { useMessage } from 'naive-ui'
 
 export default {
   name: 'LoginView',
-  components: {
-    // ModalLogin
-  },
   setup () {
     const loginUrl = '/api/login'
     const message = useMessage()
@@ -118,7 +113,6 @@ export default {
         })
         .then((response) => {
           loading.value = false
-          console.log('am i joke to u?')
           console.log(resp.value)
           return resp.value
         })
@@ -155,13 +149,6 @@ export default {
         })
       }
     }
-  },
-  data () {
-    return {
-    }
-  },
-  methods: {
-
   },
   computed: mapState([
     'style'
