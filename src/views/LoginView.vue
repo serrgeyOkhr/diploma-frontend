@@ -28,6 +28,7 @@
               />
             </n-form-item>
             <n-button
+              :loading="loading"
               :block= true
               :bordered= false
               :color=style.colors.yellow
@@ -35,7 +36,7 @@
               @click='handleValidateClick'
               size='large'
               class='button'
-            > Войти</n-button>
+            > Войти </n-button>
           </n-form>
       <!-- <pre>
         login: {{formValue.login}}
@@ -55,7 +56,7 @@
 /* eslint-disable no-unused-vars */
 // @ is an alias to /src
 // import ModalLogin from '@/components/ModalLogin.vue'
-import { ref } from 'vue'
+import { ref, toRaw } from 'vue'
 import { useRouter } from 'vue-router'
 import { mapState, useStore } from 'vuex'
 import { useMessage } from 'naive-ui'
@@ -66,7 +67,7 @@ export default {
     // ModalLogin
   },
   setup () {
-    const loginUrl = 'http://127.0.0.1:5000/login'
+    const loginUrl = '/api/login'
     const message = useMessage()
     const store = useStore()
     const router = useRouter()
@@ -90,7 +91,7 @@ export default {
         trigger: ['input', 'blur']
       }
     })
-    function getUser (data) {
+    async function getUser (data) {
       /* ожидаемый return: {  responce: xxx (type: Number),
                               user: {
                                 name: 'Jon' (type: String),
@@ -104,7 +105,7 @@ export default {
         password: data.value.password
       }
       loading.value = true
-      fetch(loginUrl, {
+      const trig = await fetch(loginUrl, {
         method: 'POST',
         mode: 'cors',
         headers: {
@@ -112,60 +113,24 @@ export default {
         },
         body: JSON.stringify(body)
       })
-        .then(async (response) => { resp.value = await response.json() })
-        .then((response) => { loading.value = false })
+        .then((response) => {
+          resp.value = response.json()
+        })
+        .then((response) => {
+          loading.value = false
+          console.log('am i joke to u?')
+          console.log(resp.value)
+          return resp.value
+        })
         .catch((error) => {
           customError.value = error
           setTimeout(() => { loading.value = false }, 1000)
         })
-      store.commit('updateUser', resp.value.user)
-      return resp.value
-    }
-
-    function getStaticUser (data) {
-      const Result = {
-        response: 200,
-        user: {
-          name: 'Сергей Вячеславович',
-          type: 1,
-          group: 'ИТ-181'
-        }
+      const ret = await trig
+      if (ret.user) {
+        store.commit('updateUser', ret.user)
       }
-      store.commit('updateUser', Result.user)
-      return Result
-    }
-    function getStaticProf (data) {
-      const Result = {
-        response: 200,
-        user: {
-          name: 'Антон Денисович',
-          type: 2,
-          group: undefined
-        }
-      }
-      store.commit('updateUser', Result.user)
-      return Result
-    }
-
-    function getStaticAdmin (data) {
-      const Result = {
-        response: 200,
-        user: {
-          name: 'Админ Админович',
-          type: 69,
-          group: undefined
-        }
-      }
-      store.commit('updateUser', Result.user)
-      return Result
-    }
-    function getStaticErrorUser (data) {
-      const Result = {
-        response: 400,
-        user: undefined
-      }
-      // store.commit('updateUser', Result.user)
-      return Result
+      return ret
     }
 
     return {
@@ -175,13 +140,11 @@ export default {
       loading,
       handleValidateClick (e) {
         e.preventDefault()
-        formRef.value?.validate((errors) => {
+        formRef.value?.validate(async (errors) => {
           if (!errors) {
-            // const rez = getUser(formValue)
-            // const rez = getStaticUser(formValue)
-            const rez = getStaticProf(formValue)
-            // const rez = getStaticAdmin(formValue)
-            // const rez = getStaticErrorUser(formValue)
+            const rez = await getUser(formValue)
+            console.log(await getUser(formValue))
+            console.log(rez)
             if (rez.response === 200) {
               message.info('Здравствуй, ' + rez.user.name)
               router.push({ path: '/' })
