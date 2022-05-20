@@ -11,6 +11,7 @@ export function makeServer ({ environment = 'development' } = {}) {
 
     seeds (server) {
       server.create('user', {
+        id: 1,
         name: 'Сергей Вячеславович',
         type: 1,
         group: 'ИТ-181',
@@ -18,6 +19,15 @@ export function makeServer ({ environment = 'development' } = {}) {
         password: '1111'
       })
       server.create('user', {
+        id: 2,
+        name: 'Александр Константинович',
+        type: 1,
+        group: 'ИТ-182',
+        login: 'stud_02',
+        password: '1111'
+      })
+      server.create('user', {
+        id: 3,
         name: 'Антон Денисович',
         type: 2,
         group: undefined,
@@ -25,6 +35,7 @@ export function makeServer ({ environment = 'development' } = {}) {
         password: '1111'
       })
       server.create('user', {
+        id: 4,
         name: 'Админ Админович',
         type: 69,
         group: undefined,
@@ -32,7 +43,66 @@ export function makeServer ({ environment = 'development' } = {}) {
         password: 'admin'
       })
 
-      server.create('task', { name: 'задание 1', description: 'Первое задание, из фейк сервера' })
+      server.create('task', {
+        id: 1,
+        deadline: '2022,05,15',
+        subject: 'Предмет 1',
+        name: 'Квадрат числа 1',
+        description: 'В этом задании требуется найти квадрат числа, поданного на вход',
+        published: true,
+        group: 'ИТ-181',
+        examples: [
+          { input: 5, output: [25] },
+          { input: 10, output: [100] },
+          { input: 0, output: [0] }
+        ],
+        done: false
+      })
+      server.create('task', {
+        id: 2,
+        deadline: '10.10.2022',
+        subject: 'Предмет 2',
+        name: 'Сортировка массива 2',
+        description: 'В этом задании требуется отсортировать массив. На вход программы подается массив чисел, на выход отсортированный массив по возрастанию',
+        published: true,
+        group: 'ИТ-181',
+        examples: [
+          { input: [3, 1, 2, 6, 5, 4], output: [[1, 2, 3, 4, 5, 6]] },
+          { input: [1, -1, 0], output: [[-1, 0, 1]] },
+          { input: [], output: [[]] }
+        ],
+        done: false
+      })
+      server.create('task', {
+        id: 3,
+        deadline: '10.10.2022',
+        subject: 'Предмет 2',
+        name: 'Сортировка массива 3',
+        description: 'В этом задании требуется отсортировать массив. На вход программы подается массив чисел, на выход отсортированный массив по возрастанию',
+        published: true,
+        group: 'ИТ-182',
+        examples: [
+          { input: [3, 1, 2, 6, 5, 4], output: [[1, 2, 3, 4, 5, 6]] },
+          { input: [1, -1, 0], output: [[-1, 0, 1]] },
+          { input: [], output: [[]] }
+        ],
+        done: false
+      })
+      server.create('task', {
+        id: 4,
+        deadline: '10.10.2022',
+        subject: 'Предмет 1',
+        name: 'Сортировка массива 4',
+        description: 'В этом задании требуется отсортировать массив. На вход программы подается массив чисел, на выход отсортированный массив по возрастанию',
+        published: true,
+        group: 'ИТ-182',
+        examples: [
+          { input: [3, 1, 2, 6, 5, 4], output: [[1, 2, 3, 4, 5, 6]] },
+          { input: [1, -1, 0], output: [[-1, 0, 1]] },
+          { input: [], output: [[]] }
+        ],
+        done: false
+      })
     },
 
     routes () {

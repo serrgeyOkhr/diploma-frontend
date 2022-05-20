@@ -147,18 +147,14 @@ export default {
       *   }
       * ]
       */
-      const body = {
-        id: user.id
-      }
 
       loading.value = true
       fetch(tasksUrl, {
-        method: 'POST',
+        method: 'GET',
         mode: 'cors',
         headers: {
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(body)
+        }
       })
         .then(async (response) => { resp.value = await response.json() })
         .then((response) => { loading.value = false })

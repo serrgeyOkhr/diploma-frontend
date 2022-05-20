@@ -27,19 +27,24 @@ import { ref, toRef } from '@vue/reactivity'
 export default {
   name: 'result-list',
   props: {
-    id: {
+    _taskId: {
+      type: Number
+    },
+    userId: {
       type: Number
     }
   },
   setup (props) {
     // const rezUrl = 'http://127.0.0.1:5000/get_shortRez'
-    const taskId = toRef(props, 'id')
+    const taskId = toRef(props, '_taskId')
+    const user = toRef(props, 'userId')
     // const resList = getResults(taskId.value)
     const resList = ref([
       { id: 3, status: 'passed', date: '2022-03-28T13:59:41.102Z' },
       { id: 2, status: 'test_failed', date: '2022-03-28T13:58:41.102Z' },
       { id: 1, status: 'runtime_error', date: '2022-03-28T13:57:41.102Z' }
     ])
+    console.log('taskId', taskId.value, ': user', user.value)
     console.log(resList.value)
     if (resList.value === null) {
       resList.value = false
@@ -65,6 +70,7 @@ export default {
 
     return {
       taskId,
+      user,
       resList
     }
   }

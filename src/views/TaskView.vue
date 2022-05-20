@@ -22,7 +22,7 @@
           <n-button class="testButton btn" :class="{handle_active: toggleView}" @click="toggleView = true">Задание</n-button>
           <n-button class="testButton btn" :class="{handle_active: !toggleView}"  @click="toggleView = false">Результаты</n-button>
           <div class="description">
-            <ResultList :id='locTask.id' @handler_click="hello"/>
+            <ResultList :_taskId='locTask.id' :userId='userID' @handler_click="hello"/>
           </div>
         </div>
       </div>
@@ -33,17 +33,18 @@
 
   </div>
   <div v-if="userType === 2" class="container">
-    <div class="description">
-      <div class="content">
-        <!-- <TaskDescription :task=locTask /> -->
-        Придумать как это сделать
+    <div class="content">
+      <div class="subclass">
+        <StudentsList :id='locTask.id' @getResult="changeResultView"  :activeStudent='activeStudent' :key='activeStudent' />
+        <div class="changeTaskButton">
+          <n-button @click="changeTask()">Редактировать задание</n-button>
+        </div>
       </div>
-      <div class="changeTaskButton">
-        <n-button @click="changeTask()">Редактировать задание</n-button>
+      <div class="resultsList">
+        <div class="">
+          <ResultList v-if="activeStudent !== null" :_taskId='locTask.id' :userId='activeStudent' @handler_click="hello" :key='activeStudent' />
+        </div>
       </div>
-    </div>
-    <div class="expectation">
-      <div class="resultsList">Список результатов</div>
     </div>
   </div>
 </template>
@@ -54,6 +55,8 @@ import TaskDescription from '../components/TaskDescription.vue'
 import CodeTaker from '../components/CodeTaker.vue'
 import ResultList from '../components/ResultList.vue'
 import DetailResult from '../components/DetailRez.vue'
+import StudentsList from '../components/StudentsList.vue'
+// import StudentTaskResult from '../components/StudentTaskResult.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { ref } from '@vue/reactivity'
@@ -64,7 +67,8 @@ export default {
     TaskDescription,
     CodeTaker,
     ResultList,
-    DetailResult
+    DetailResult,
+    StudentsList
   },
   setup () {
     const route = useRoute()
@@ -76,6 +80,7 @@ export default {
     const subjects = new Set()
     const groups = new Set()
     const detailTask = ref({ id: null, status: null })
+    const activeStudent = ref(null)
 
     const locTask = tasks.filter((task) => {
       // console.log(task.id)
@@ -96,6 +101,11 @@ export default {
       detailTask.value.id = data.id
       detailTask.value.status = data.status
     }
+    function changeResultView (id) {
+      activeStudent.value = id
+      console.log('show result for user with ID = ', id)
+      console.log('active student = ', activeStudent.value)
+    }
     // console.log(locTask.id)
     // console.log(locTask)
     return {
@@ -103,7 +113,9 @@ export default {
       toggleView,
       userType,
       detailTask,
+      activeStudent,
       changeTask,
+      changeResultView,
       hello
     }
   }
@@ -143,12 +155,8 @@ export default {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
-.expectation{
-  /* width: 70%; */
-  /* margin: 0 10px; */
-  /* padding: 0 5px; */
-  /* background-color: #ccc; */
-}
+/* .expectation{
+} */
 .navBar{
   margin-top: 10px;
 }
