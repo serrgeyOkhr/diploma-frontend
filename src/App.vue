@@ -1,8 +1,10 @@
 <template>
   <n-config-provider :theme-overrides="themeOverrides">
+  <Suspense>
     <n-message-provider>
       <router-view/>
     </n-message-provider>
+  </Suspense>
   </n-config-provider>
 </template>
 

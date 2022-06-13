@@ -1,6 +1,6 @@
 <template>
   <header class="header">
-    <nav class="navigation">
+    <nav class="navigation" v-if="user.type !== 69">
         <n-button v-if="allSubjects.size > 0"
           :class="['testButton', 'btn', {handle_active: thisShowSubject === 'all'}]" @click="$emit('setTasks', 'all' )"
           :color=this.style.colors.yellow
@@ -25,6 +25,23 @@
         @click="$emit('setTasks', subject)"
         >{{subject}}</n-button>
     </nav>
+    <nav class="navigation" v-else>
+        <n-button
+          :class="['testButton', 'btn', {handle_active: thisShowSubject === subject}]"
+          @click="$emit('adminPage', 'person')"
+          :color=this.style.colors.yellow
+          ghost
+          text-color='#000000'
+        > Работа с пользователем
+        </n-button>
+        <n-button
+        :class="['testButton', 'btn', {handle_active: thisShowSubject === subject}]"
+        :color=this.style.colors.yellow
+        text-color='#000000'
+        ghost
+        @click="$emit('adminPage', 'subject')"
+        >Работа с группой / предметом</n-button>
+    </nav>
     <div class="header_group">
       <span>
         {{this.user.name}}
@@ -35,7 +52,7 @@
       <n-button
         class='exitButton btn'
         ghost
-        :color=this.style.colors.purple
+        :color='this.style.colors.purple'
         text-color='#000000'
         @click="logOut()"
       >Выход</n-button>

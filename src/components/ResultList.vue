@@ -3,6 +3,7 @@
     <div
     class="resultBlock"
     v-for="(elem, index) in resList"
+    :class="{activeElem: elem.id === active}"
     :key="index"
     @click="$emit('handler_click', {id: elem.id, status: elem.status})"
     >
@@ -32,12 +33,16 @@ export default {
     },
     userId: {
       type: Number
+    },
+    activeID: {
+      type: Number
     }
   },
   setup (props) {
     // const rezUrl = 'http://127.0.0.1:5000/get_shortRez'
     const taskId = toRef(props, '_taskId')
     const user = toRef(props, 'userId')
+    const active = toRef(props, 'activeID')
     // const resList = getResults(taskId.value)
     const resList = ref([
       { id: 3, status: 'passed', date: '2022-03-28T13:59:41.102Z' },
@@ -71,6 +76,7 @@ export default {
     return {
       taskId,
       user,
+      active,
       resList
     }
   }
@@ -98,5 +104,8 @@ export default {
 }
 .timeStamp{
   font-size: 16px;
+}
+.activeElem {
+  background-color: rgb(243, 244, 194);
 }
 </style>

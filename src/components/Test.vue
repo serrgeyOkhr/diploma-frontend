@@ -4,7 +4,7 @@
   >
   <div class="test_container">
     <div class="test_header">
-      <span class="test_title">Тест {{ index }} </span>
+      <span class="test_title">Тест {{ index + 1}} </span>
       <n-button type="error" @click="removeTest(index)">Удалить</n-button>
     </div>
     <div class="test_wrap">
@@ -23,31 +23,26 @@
           </n-popover>
         </div>
         <n-dynamic-input
-        v-model:value="inputData"
-        item-style="border: 1px solid; border-radius: 5px; padding: 5px;"
-        :min=1
-        :on-update="updateInputData('input', inputData)"
+          v-model:value="inputData"
+          item-style="border: 1px solid; border-radius: 5px; padding: 5px;"
+          :min=1
+          :on-update="updateInputData('input', inputData)"
         >
         </n-dynamic-input>
       </div>
       <div class="test_outputs">
         <span :class="{testWarning: outputCheckForArray}">Выходные данные: </span>
-            <n-dynamic-input
-            v-model:value="outputData"
-            item-style="border: 1px solid; border-radius: 5px; padding: 5px;"
-            :min=1
-            :on-update="updateOutputData('output',outputData)">
-              <!-- <template #default="{ value }">
-                <div style="display: flex; align-items: center; width: 100%">
-                  <n-input v-model:value="value.output" type="text" />
-                </div>
-              </template> -->
-            </n-dynamic-input>
+        <n-dynamic-input
+          v-model:value="outputData"
+          item-style="border: 1px solid; border-radius: 5px; padding: 5px;"
+          :min=1
+          :on-update="updateOutputData('output',outputData)">
+        </n-dynamic-input>
       </div>
     </div>
-    <div class="test_actives">
+    <!-- <div class="test_actives">
       as example
-    </div>
+    </div> -->
   </div>
   <!-- <pre>
   </pre> -->
@@ -76,12 +71,8 @@ export default {
 
     // console.log(props)
     if (props.test) {
-      // console.log(props.test.input)
-      // console.log(props.taskId)
-      // console.log(props.test.output)
       const task = store.state.tasks.filter((element) => { return element.id === props.taskId })
       tests = task[0].examples
-      // console.log('task', tests)
     }
     const curTest = tests[props.index]
     if (curTest) {
@@ -144,21 +135,16 @@ export default {
       data = toRaw(data)
       data.forEach((el, index) => {
         if (el) {
-          // console.log(el)
-
           if (!Number.isNaN(Number(el)) && typeof (el) !== 'object') {
             console.log(!Number.isNaN(Number(el)))
             outputCheckForArray.value = false
             el = JSON.parse(el)
           } else if (typeof (el) === 'object') {
             el = JSON.stringify(el)
-            // console.log('this is obj')
           } else if (el.startsWith('[') && el.endsWith(']')) {
             el = JSON.parse('"' + el + '"')
-            // console.log('это Mассив')
             outputCheckForArray.value = false
           } else if (el.startsWith('[') || el.endsWith(']')) {
-            // console.log('возможно, это массив')
             outputCheckForArray.value = true
           }
           data[index] = el

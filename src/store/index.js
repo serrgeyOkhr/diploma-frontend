@@ -9,11 +9,11 @@ export default createStore({
         purple: '#9672F7'
       }
     },
-    user: {
-      name: '',
-      type: 69,
-      group: ''
-    },
+    // user: {
+    //   name: '',
+    //   type: '',
+    //   group: ''
+    // },
     tasks: [{
       id: 12,
       deadline: '2022,05,15',
@@ -28,14 +28,17 @@ export default createStore({
   },
   mutations: {
     updateUser (state, user) {
+      // console.log('from state', user)
+      // console.log('state.user', state)
       state.user.name = user.name
-      state.user.type = user.type
+      state.user.type = user.user_type
       state.user.group = user.group
     },
     createTasks (state, data) {
       state.tasks = []
-      if (data.value) {
-        data.value.forEach(element => {
+      if (data) {
+        data.tasks.forEach(element => {
+          console.log(element)
           state.tasks.push(element)
         })
       }

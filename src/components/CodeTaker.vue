@@ -1,4 +1,3 @@
-/* eslint-disable no-useless-escape */
 <template>
   <div class="container">
     <div class="selectors">
@@ -7,6 +6,7 @@
     </div>
     <div class="codeForm">
     <CodeEditor
+      theme="light"
       v-model="formVal"
       font_size="16px"
       width="100%"
@@ -85,19 +85,16 @@ export default {
     ]
 
     function getFormVal () {
-      console.log('here')
-      console.log(formVal)
       sendSolution(formVal)
       // return formVal.value.toLowerCase()
     }
     function getTests () {
       const tests = props.task.examples
-      console.log('body.spec.tests', toRaw(tests))
+      // console.log('body.spec.tests', toRaw(tests))
       return toRaw(tests)
     }
 
     function sendSolution (data) {
-      console.log('daTA', data)
       const body = {
         id: 'square',
         spec: {

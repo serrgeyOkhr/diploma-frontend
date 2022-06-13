@@ -22,7 +22,7 @@
           <n-button class="testButton btn" :class="{handle_active: toggleView}" @click="toggleView = true">Задание</n-button>
           <n-button class="testButton btn" :class="{handle_active: !toggleView}"  @click="toggleView = false">Результаты</n-button>
           <div class="description">
-            <ResultList :_taskId='locTask.id' :userId='userID' @handler_click="hello"/>
+            <ResultList :_taskId='locTask.id' :userId='userID' @handler_click="hello" :activeID="detailTask.id" />
           </div>
         </div>
       </div>

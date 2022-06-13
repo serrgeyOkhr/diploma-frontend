@@ -3,6 +3,7 @@
   <h2>Решение</h2>
     <div class="rawCode">
       <CodeEditor
+        theme="light"
         :key='result[0].id'
         :value="result[0].code"
         font_size="16px"

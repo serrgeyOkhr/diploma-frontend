@@ -1,13 +1,13 @@
 <template>
   <div class="home">
-    <Header @setTasks="setTasks" :subjects='subjects' :showSubject='showSubject'/>
-    <div v-if="user.type === 69" class="container">
-      <Admin />
+    <Header @adminPage="adminPage" @setTasks="setTasks" :subjects='subjects' :showSubject='showSubject' />
+    <div v-if="user.type === 'admin'" class="container">
+      <Admin :showSettings='showSettings' />
     </div>
     <div v-else class="container">
-      <div class="taskBar" v-if="user.type === 2">
+      <div class="taskBar" v-if="user.type === 'teacher'">
         <div class="taskBarContent" v-for='(group, index) in groups' :key='index'>
-          <h2 class=group_header v-if='user.type === 2 && groups.length >= 1' @click="updateShow(index)"> {{ group.title }} </h2>
+          <h2 class=group_header v-if="user.type === 'teacher' && groups.length >= 1" @click="updateShow(index)"> {{ group.title }} </h2>
           <div class="groupTasks">
             <TaskCom
             v-for='(task, index) in showTask(group.title)'
@@ -16,12 +16,17 @@
             :title="task.name"
             :description="task.description"
             :published="task.published"
-            :done="task.done"
             @openPage="openTask(task.id, task)"
             />
           </div>
         </div>
-        <n-button class='addTask' @click='createTask()' :color=this.style.colors.purple>Добавить задание</n-button>
+        <n-button
+        class='addTask'
+        @click='createTask()'
+        :color='this.style.colors.purple'
+        >
+        Добавить задание
+        </n-button>
       </div>
       <div class="taskBar" v-else>
         <TaskCom
@@ -70,8 +75,8 @@ export default {
   },
   methods: {
     showTask (groupTitle) {
-      if (this.tasks) {
-        return this.showSubject === 'all' ? this.tasks.filter((el) => { return el.group === groupTitle }) : this.tasks.filter(el => el.subject === this.showSubject).filter((el) => { return el.group === groupTitle })
+      if (this.tasks.tasks) {
+        return this.showSubject === 'all' ? this.tasks.tasks.filter((el) => { return el.group === groupTitle }) : this.tasks.tasks.filter(el => el.subject === this.showSubject).filter((el) => { return el.group === groupTitle })
       }
     },
     setTasks (subject) {
@@ -79,10 +84,13 @@ export default {
       if (subject === 'all') {
         return null
       }
+    },
+    adminPage (selector) {
+      this.showSettings = selector
     }
   },
-  setup () {
-    const tasksUrl = 'http://127.0.0.1:5000/get_tasks'
+  async setup () {
+    const tasksUrl = 'http://100.90.100.22:5000/api/get_tasks'
     const store = useStore()
     const router = useRouter()
     const user = ref(store.state.user)
@@ -91,20 +99,24 @@ export default {
     const customError = ref(null)
     const loading = ref(null)
     const tasks = ref(null)
+    const showSettings = ref('person')
     // const showGroupTask = ref(false)
-    if (user.value.type !== 69) {
-      // tasks.value = getTasks(user)
-      tasks.value = getStaticTasks() // СТАТИЧНЫЕ ЗАДАНИЯ
-    }
     const subjects = new Set()
     const groupsList = new Set()
     const groups = ref([])
 
-    if (tasks.value) {
-      tasks.value.forEach(element => {
-        subjects.add(element.subject)
-        groupsList.add(element.group)
-      })
+    if (user.value.type !== 'admin') {
+      const serverTasks = await getTasks(user)
+      // tasks.value = getStaticTasks() // СТАТИЧНЫЕ ЗАДАНИЯ
+      console.log(serverTasks.tasks)
+      if (serverTasks) {
+        serverTasks.tasks.forEach(element => {
+          subjects.add(element.subject)
+          groupsList.add(element.group)
+        })
+      }
+      setData('createTasks', serverTasks)
+      tasks.value = serverTasks
     }
 
     groupsList.forEach((el) => {
@@ -115,8 +127,7 @@ export default {
       groups.value.push(group)
     })
 
-    setData('updateUser', store.state.user)
-    setData('createTasks', tasks)
+    // setData('updateUser', store.state.user)
 
     function setData (place, data) {
       store.commit(place, data)
@@ -131,7 +142,7 @@ export default {
       groups.value[index].show = !groups.value[index].show
     }
 
-    function getTasks (user) {
+    async function getTasks (user) {
       /** ожидаемый return:
       * [
       *   {
@@ -149,21 +160,22 @@ export default {
       */
 
       loading.value = true
-      fetch(tasksUrl, {
+      await fetch(tasksUrl, {
         method: 'GET',
-        mode: 'cors',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
         }
       })
-        .then(async (response) => { resp.value = await response.json() })
-        .then((response) => { loading.value = false })
-        .catch((error) => {
-          customError.value = error
-          setTimeout(() => { loading.value = false }, 1000)
+        .then(response => response.json())
+        .then(result => {
+          console.log(result.tasks)
+          resp.value = result
+          console.log(resp.value.tasks)
         })
-      return toRaw(resp.value)
+      return (resp.value)
     }
+
     function getStaticTasks () {
       const tasks = [{
         id: 1,
@@ -241,10 +253,11 @@ export default {
     // localStorage.setItem('User', JSON.stringify(store.state.user))
     return {
       subjects,
-      tasks,
       groupsList,
       groups,
+      tasks,
       user,
+      showSettings,
       style,
       openTask,
       // showGroupTask,

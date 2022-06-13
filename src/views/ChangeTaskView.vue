@@ -176,13 +176,15 @@ export default {
         // console.log(element.id)
       })
       const lastId = idArr.sort().pop()
-      newTask.id = lastId + 1
+      newTask.id = String(Number(lastId) + 1)
       setData('addNewTasks', newTask)
-      // console.log('Biggest one', lastId)
+      console.log('Biggest one', lastId)
       return newTask
     }
 
     function saveTask () {
+      console.log('here0', tasks)
+      console.log('here0', props.params.id)
       console.log('here0', tasks[props.params.id - 1])
     }
 

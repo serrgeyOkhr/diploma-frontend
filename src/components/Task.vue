@@ -15,7 +15,7 @@
         <EyeOff />
       </n-icon>
     </div>
-    <div class="icon_box" @click="changeVis({id, visible})" v-else>
+    <div class="icon_box" v-else>
       <n-icon v-if='done' size="40">
         <Checkmark color='#3DC727' />
       </n-icon>
@@ -59,7 +59,6 @@ export default {
     changeVis () {
       this.visible = !this.visible
       const data = { id: this.id, published: this.visible }
-      // Отправить на сервер. (если тру, то ->)
       this.setVis(data)
     },
     ...mapMutations({
