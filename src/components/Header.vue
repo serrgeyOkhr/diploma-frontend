@@ -1,6 +1,6 @@
 <template>
   <header class="header">
-    <nav class="navigation" v-if="user.type !== 69">
+    <nav class="navigation" v-if="user.type !== 'admin'">
         <n-button v-if="allSubjects.size > 0"
           :class="['testButton', 'btn', {handle_active: thisShowSubject === 'all'}]" @click="$emit('setTasks', 'all' )"
           :color=this.style.colors.yellow

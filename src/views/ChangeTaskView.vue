@@ -2,118 +2,127 @@
   <Header/>
   <div class="container">
     <div class="taskDescription">
-      <div class="taskDescriptionItem">
-        <div class="taskDescriptionItemContainer">
-          <h2>Название: </h2>
-            <n-popover trigger="hover" raw :show-arrow="false">
-              <template #trigger>
-                <span class="itemHealper">?</span>
-              </template>
-              <div class="popoverHealper">
-                <span>
-                  Название задания. Например: Задание 1 <br> new line
-                </span>
-              </div>
-            </n-popover>
-          <h3 class="testDescriptionDynamic"> {{taskValue.name}} </h3>
+      <n-form ref="formRef" :rules="rules" :model="taskValue">
+        <n-form-item path="title">
+          <div class="taskDescriptionItem">
+            <div class="taskDescriptionItemContainer">
+              <h2>Название: </h2>
+                <n-popover trigger="hover" raw :show-arrow="false">
+                  <template #trigger>
+                    <span class="itemHealper">?</span>
+                  </template>
+                  <div class="popoverHealper">
+                    <span>
+                      Название задания. Например: Задание 1 <br> new line
+                    </span>
+                  </div>
+                </n-popover>
+              <h3 class="testDescriptionDynamic"> {{taskValue.title}} </h3>
+            </div>
+            <div class="taskInputWrap">
+              <n-input class="taskInput" type="text" v-model:value="taskValue.title" />
+            </div>
         </div>
-        <div class="taskInputWrap">
-          <n-input class="taskInput" type="text" v-model:value="taskValue.name" />
+      </n-form-item>
+        <div class="taskDescriptionItem">
+          <div>
+            <h4>Описание: </h4>
+                <n-popover trigger="hover" raw :show-arrow="false">
+                  <template #trigger>
+                    <span class="itemHealper">?</span>
+                  </template>
+                  <div class="popoverHealper">
+                    <span>
+                      Полное описание задания. Что сделать, как? Какие цели у этого задания. Связь с реальным миром.
+                    </span>
+                  </div>
+                </n-popover>
+          </div>
+          <div class="taskInput">
+            <n-input type="textarea" v-model:value="taskValue.description" />
         </div>
-      </div>
-      <div class="taskDescriptionItem">
-        <div>
-          <h4>Описание: </h4>
+        </div>
+        <n-form-item path="subject">
+          <div class="taskDescriptionItem">
+          <div>
+            <h4>Предмет: </h4>
               <n-popover trigger="hover" raw :show-arrow="false">
                 <template #trigger>
                   <span class="itemHealper">?</span>
                 </template>
                 <div class="popoverHealper">
                   <span>
-                    Полное описание задания. Что сделать, как? Какие цели у этого задания. Связь с реальным миром.
+                    Выберите предмет, для которого предназначается это задание
                   </span>
                 </div>
               </n-popover>
+          </div>
+          <div class="taskInput">
+            <n-select v-model:value="taskValue.subject" :options="subjects" remote />
+            <!-- <n-input type="text" v-model:value="taskValue.subject" /> -->
         </div>
-        <div class="taskInput">
-          <n-input type="textarea" v-model:value="taskValue.description" />
-       </div>
-      </div>
-      <div class="taskDescriptionItem">
-        <div>
-          <h4>Предмет: </h4>
-            <n-popover trigger="hover" raw :show-arrow="false">
-              <template #trigger>
-                <span class="itemHealper">?</span>
-              </template>
-              <div class="popoverHealper">
-                <span>
-                  Выберите предмет, для которого предназначается это задание
-                </span>
-              </div>
-            </n-popover>
         </div>
-        <div class="taskInput">
-          <n-select v-model:value="taskValue.subject" :options="subjects" />
-          <!-- <n-input type="text" v-model:value="taskValue.subject" /> -->
-       </div>
-      </div>
-      <div class="taskDescriptionItem">
-        <div>
-          <h4>Группа: </h4>
-            <n-popover trigger="hover" raw :show-arrow="false">
-              <template #trigger>
-                <span class="itemHealper">?</span>
-              </template>
-              <div class="popoverHealper">
-                <span>
-                  Укажите номер группы, для которой предназначается задание
-                </span>
-              </div>
-            </n-popover>
+        </n-form-item>
+        <n-form-item path="group">
+        <div class="taskDescriptionItem">
+          <div>
+            <h4>Группа: </h4>
+              <n-popover trigger="hover" raw :show-arrow="false">
+                <template #trigger>
+                  <span class="itemHealper">?</span>
+                </template>
+                <div class="popoverHealper">
+                  <span>
+                    Укажите номер группы, для которой предназначается задание
+                  </span>
+                </div>
+              </n-popover>
+          </div>
+          <div class="taskInput">
+            <n-select v-model:value="taskValue.group" :options="groups" />
         </div>
-        <div class="taskInput">
-          <n-select v-model:value="taskValue.group" :options="groups" />
-       </div>
-      </div>
-      <div class="taskDescriptionItem">
-        <div>
-          <h4>Крайний срок сдачи: </h4>
-            <n-popover trigger="hover" raw :show-arrow="false">
-              <template #trigger>
-                <span class="itemHealper">?</span>
-              </template>
-              <div class="popoverHealper">
-                <span>
-                  Установите дедлайн для задания. Эта дата будет показана на странице заданий
-                </span>
-              </div>
-            </n-popover>
         </div>
-        <div class="taskInput">
-          <n-date-picker class="date_input" type="date" v-model:value="taskValue.deadline"  />
-          <!-- <pre> {{taskValue.deadline}} </pre> -->
-       </div>
-      </div>
-      <div class="taskDescriptionItem">
-        <div>
-          <h4>Задать язык для выполнения задания: </h4>
-            <n-popover trigger="hover" raw :show-arrow="false">
-              <template #trigger>
-                <span class="itemHealper">?</span>
-              </template>
-              <div class="popoverHealper">
-                <span>
-                  Можно установить специфичный язык, требуемый для этого задания. Для текущего задания выбор языков будет недоступен!
-                </span>
-              </div>
-            </n-popover>
+        </n-form-item>
+        <div class="taskDescriptionItem">
+          <div>
+            <h4>Крайний срок сдачи: </h4>
+              <n-popover trigger="hover" raw :show-arrow="false">
+                <template #trigger>
+                  <span class="itemHealper">?</span>
+                </template>
+                <div class="popoverHealper">
+                  <span>
+                    Установите дедлайн для задания. Эта дата будет показана на странице заданий
+                  </span>
+                </div>
+              </n-popover>
+          </div>
+          <div class="taskInput">
+            <n-date-picker class="date_input" type="date" v-model:value="taskValue.deadline"  />
+            <!-- <pre> {{taskValue.deadline}} </pre> -->
         </div>
-        <div class="taskInput">
-          <n-input type="text" v-model:value="taskValue.newField" />
-       </div>
-      </div>
-      <n-button class="save_change_btn" @click="saveTask">Сохранить задание</n-button>
+        </div>
+        <div class="taskDescriptionItem">
+          <div>
+            <h4>Задать язык для выполнения задания: </h4>
+              <n-popover trigger="hover" raw :show-arrow="false">
+                <template #trigger>
+                  <span class="itemHealper">?</span>
+                </template>
+                <div class="popoverHealper">
+                  <span>
+                    Можно установить специфичный язык, требуемый для этого задания. Для текущего задания выбор языков будет недоступен!
+                  </span>
+                </div>
+              </n-popover>
+          </div>
+          <div class="taskInput">
+            <n-input type="text" v-model:value="taskValue.newField" />
+        </div>
+        </div>
+        <n-button class="save_change_btn" @click="saveTask">Сохранить задание</n-button>
+        <pre> {{taskValue}} </pre>
+      </n-form>
     </div>
       <div class="testCase">
         <div class="tests_wrapper">
@@ -138,38 +147,131 @@ import { useStore } from 'vuex'
 import Header from '../components/Header.vue'
 import Test from '../components/Test.vue'
 export default {
-  name: 'ChangeTask',
+  title: 'ChangeTask',
   components: {
     Header,
     Test
   },
   setup () {
+    const URLgetGroups = 'http://100.90.100.22:5000/api/get_groups'
+    const URLgetSubjects = 'http://100.90.100.22:5000/api/get_subjects'
     const props = useRoute()
     const store = useStore()
+    const formRef = ref(null)
+    const allTests = ref(null)
     const tasks = store.state.tasks
-    const setSubjects = new Set()
-    const setGroups = new Set()
-    const subjects = []
-    const groups = []
-    tasks.forEach(element => {
-      setSubjects.add(element.subject)
-      setGroups.add(element.group)
+    const updateTask = ref(props.params.id ? 'http://100.90.100.22:5000/api/edit_task' : 'http://100.90.100.22:5000/api/create_task')
+    const rules = ref({
+      title: {
+        required: true,
+        message: 'Это поле обязательно для ввода',
+        trigger: ['input', 'blur']
+      },
+      subject: {
+        required: true,
+        message: 'Выберите элемент!',
+        trigger: ['input', 'blur']
+      },
+      group: {
+        required: true,
+        message: 'Выберите элемент!',
+        trigger: ['input', 'blur']
+      }
     })
-    setSubjects.forEach(el => { subjects.push({ label: el, value: el }) })
-    setGroups.forEach(el => { groups.push({ label: el, value: el }) })
+    // const setSubjects = new Set()
+    // const setGroups = ref(null)
+    const subjects = ref([])
+    const groups = ref([])
+    getSubjects(subjects)
+    getGroups(groups)
+
+    function getSubjects (subjects) {
+      fetch(URLgetSubjects, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(response => response.json())
+        .then(result => {
+          result.forEach((el) => {
+            subjects.value.push(
+              {
+                label: el.full_name,
+                value: el.id
+              }
+            )
+          })
+          // console.log(resp.value)
+        })
+    }
+    function getGroups () {
+      fetch(URLgetGroups, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(response => response.json())
+        .then(result => {
+          result.forEach((el) => {
+            groups.value.push(
+              {
+                label: el.id,
+                value: el.id
+              }
+            )
+          })
+        })
+    }
+
     const taskValue = ref(props.params.id ? tasks.filter((task) => { return Number(props.params.id) === Number(task.id) })[0] : createNewTask())
     function setData (place, data) {
       store.commit(place, data)
     }
+    getTaskDetails(taskValue.value.id, taskValue)
+    function getTaskDetails (taskId, output) {
+      const taskDetailUrl = 'http://100.90.100.22:5000/api/get_task_details'
+      const body = {
+        task_id: taskId
+      }
+      console.log(body)
+      sendTaskDetails(taskDetailUrl, body, output)
+    }
+
+    function sendTaskDetails (URL, body, output) {
+      fetch(URL, {
+        method: 'POST',
+        mode: 'cors',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      })
+        .then(response => response.json())
+        .then(result => {
+          console.log(result)
+          output.value.examples = result.tests
+          store.commit('saveNewTask', output)
+        })
+    }
+    console.log('allTests', allTests)
+
     if (typeof (taskValue.value.deadline) === 'string') {
-      const re = /[.]+/g
-      taskValue.value.deadline = taskValue.value.deadline.replaceAll(re, ',')
+      // const re = /[.]+/g
+      // taskValue.value.deadline = taskValue.value.deadline.replaceAll(re, ',')
       console.log(taskValue.value.deadline)
+      // console.log(Date.parse(taskValue.value.deadline))
       taskValue.value.deadline = Date.parse(taskValue.value.deadline)
     }
     function createNewTask () {
       // console.log('Я тут')
-      const newTask = { id: null, deadline: new Date(), subject: '', name: '', description: '', published: true, group: '', examples: [{}] }
+      const newTask = { id: null, deadline: new Date(), subject: '', title: '', description: '', shown: false, group: '', examples: [{}] }
       const idArr = []
       tasks.forEach(element => {
         idArr.push(element.id)
@@ -181,11 +283,42 @@ export default {
       console.log('Biggest one', lastId)
       return newTask
     }
+    // console.log('дед лайн', taskValue.value.deadline)
+    function saveTask (e) {
+      e.preventDefault()
+      formRef.value?.validate(async (errors) => {
+        if (!errors) {
+          sendToServer(taskValue)
+        }
+      })
+    }
 
-    function saveTask () {
-      console.log('here0', tasks)
-      console.log('here0', props.params.id)
-      console.log('here0', tasks[props.params.id - 1])
+    function sendToServer (data) {
+      console.log(data)
+      const body = {
+        id: props.params.id ? data.value.id : null,
+        title: data.value.title,
+        description: data.value.description,
+        deadline: new Date(data.value.deadline),
+        subject: data.value.subject,
+        group: data.value.group,
+        shown: data.value.shown,
+        examples: JSON.stringify(data.value.examples),
+        tests: JSON.stringify(data.value.examples)
+      }
+      console.log(body)
+      fetch(updateTask.value, {
+        method: 'POST',
+        mode: 'cors',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify(body)
+      })
+        .then(response => response.json())
+        .then(result => console.log(result))
     }
 
     function addTest () {
@@ -213,6 +346,8 @@ export default {
         }
       },
       props,
+      formRef,
+      rules,
       taskValue,
       subjects,
       groups,
@@ -251,6 +386,7 @@ export default {
   word-wrap: break-word;
 }
 .taskDescriptionItem{
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -260,6 +396,7 @@ export default {
 }
 .taskInput{
   /* background-color: red; */
+  width: 100%;
   border: 1px solid;
 }
 .popoverHealper{

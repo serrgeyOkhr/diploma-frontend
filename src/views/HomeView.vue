@@ -13,9 +13,10 @@
             v-for='(task, index) in showTask(group.title)'
             :id='task.id'
             :key='index'
-            :title="task.name"
+            :title="task.title"
             :description="task.description"
-            :published="task.published"
+            :published="task.shown"
+            :task="task"
             @openPage="openTask(task.id, task)"
             />
           </div>
@@ -32,10 +33,9 @@
         <TaskCom
         v-for='(task, index) in showTask(user.group)'
         :id='task.id'
-        :key='index'
-        :title="task.name"
+        :key='index + Math.random()'
+        :title="task.title"
         :description="task.description"
-        :published="task.published"
         :done="task.done"
         @openPage="openTask(task.id, task)"
         />
@@ -75,8 +75,8 @@ export default {
   },
   methods: {
     showTask (groupTitle) {
-      if (this.tasks.tasks) {
-        return this.showSubject === 'all' ? this.tasks.tasks.filter((el) => { return el.group === groupTitle }) : this.tasks.tasks.filter(el => el.subject === this.showSubject).filter((el) => { return el.group === groupTitle })
+      if (this.tasks) {
+        return this.showSubject === 'all' ? this.tasks.filter((el) => { return el.group === groupTitle }) : this.tasks.filter(el => el.subject === this.showSubject).filter((el) => { return el.group === groupTitle })
       }
     },
     setTasks (subject) {
@@ -108,9 +108,9 @@ export default {
     if (user.value.type !== 'admin') {
       const serverTasks = await getTasks(user)
       // tasks.value = getStaticTasks() // СТАТИЧНЫЕ ЗАДАНИЯ
-      console.log(serverTasks.tasks)
+      console.log(serverTasks)
       if (serverTasks) {
-        serverTasks.tasks.forEach(element => {
+        serverTasks.forEach(element => {
           subjects.add(element.subject)
           groupsList.add(element.group)
         })
@@ -162,6 +162,7 @@ export default {
       loading.value = true
       await fetch(tasksUrl, {
         method: 'GET',
+        mode: 'cors',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
@@ -169,9 +170,9 @@ export default {
       })
         .then(response => response.json())
         .then(result => {
-          console.log(result.tasks)
+          console.log(result)
           resp.value = result
-          console.log(resp.value.tasks)
+          console.log(resp.value)
         })
       return (resp.value)
     }

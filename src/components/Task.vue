@@ -5,10 +5,10 @@
       <p class="description"> {{trimDescription}} </p>
     </div>
     <div class="icon_box"
-    @click="changeVis({id, visible})"
-    v-if='done === undefined'
+    @click="changeVis()"
+    v-if='published !== undefined'
     >
-      <n-icon v-if='this.published' size="40">
+      <n-icon v-if='visible' size="40">
         <Eye  />
       </n-icon>
       <n-icon v-else size="40">
@@ -25,8 +25,8 @@
 
 <script>
 import { Eye, EyeOff, Checkmark } from '@vicons/ionicons5'
-import { ref } from '@vue/reactivity'
-import { mapMutations } from 'vuex'
+import { ref, toRef } from '@vue/reactivity'
+import { useStore } from 'vuex'
 export default {
   name: 'TaskCom',
   components: {
@@ -36,35 +36,76 @@ export default {
     id: Number,
     title: String,
     description: String,
-    published: Boolean,
+    published: {
+      type: Boolean,
+      default: undefined
+    },
     done: {
       type: Boolean,
+      default: undefined
+    },
+    task: {
+      type: Object,
       default: undefined
     }
   },
   setup (props) {
+    const updateTask = 'http://100.90.100.22:5000/api/edit_task'
     const visible = ref(props.published)
+    const taskId = toRef(props, 'id')
+    const thisTask = toRef(props, 'task')
     const toMuch = ref(props.description.substring(130))
     let trimDescription = ref(props.description)
+    const store = useStore()
+    const resp = ref(null)
     // console.log('proos', toMuch)
+    function changeVis () {
+      visible.value = !visible.value
+      const data = {
+        id: taskId.value,
+        shown: visible.value
+      }
+      const body = {
+        deadline: thisTask.value.deadline,
+        description: thisTask.value.description,
+        group: thisTask.value.group,
+        id: taskId.value,
+        shown: visible.value,
+        subject: thisTask.value.subject,
+        title: thisTask.value.title
+      }
+      store.commit('changeTaskPublished', data)
+      console.log('data = ', data)
+      fetch(updateTask, {
+        method: 'POST',
+        mode: 'cors',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      })
+        .then(response => response.json())
+        .then(result => {
+          console.log(result)
+          resp.value = result
+          console.log(resp.value)
+        })
+    }
     if (toMuch.value) {
       trimDescription = props.description.substring(0, 130) + '...'
     }
     return {
       visible,
-      trimDescription
+      trimDescription,
+      changeVis
     }
-  },
-  methods: {
-    changeVis () {
-      this.visible = !this.visible
-      const data = { id: this.id, published: this.visible }
-      this.setVis(data)
-    },
-    ...mapMutations({
-      setVis: 'changeTaskPublished'
-    })
   }
+  // methods: {
+  //   ...mapMutations({
+  //     setVis: 'changeTaskPublished'
+  //   })
+  // }
 }
 /*
 ,

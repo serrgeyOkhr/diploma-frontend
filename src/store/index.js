@@ -9,11 +9,11 @@ export default createStore({
         purple: '#9672F7'
       }
     },
-    // user: {
-    //   name: '',
-    //   type: '',
-    //   group: ''
-    // },
+    user: {
+      name: '',
+      type: '',
+      group: ''
+    },
     tasks: [{
       id: 12,
       deadline: '2022,05,15',
@@ -37,47 +37,36 @@ export default createStore({
     createTasks (state, data) {
       state.tasks = []
       if (data) {
-        data.tasks.forEach(element => {
+        data.forEach(element => {
           console.log(element)
           state.tasks.push(element)
         })
       }
     },
     addNewTasks (state, data) {
-      // console.log('store data', data)
-      // for (const element in data) {
       state.tasks.push(data)
-      // }
-      // data.forEach(element => {
-      // })
     },
     saveNewTask (state, data) {
       const task = state.tasks.filter((task) => { return task.id === data.value.id })
-      // console.log(data.value.id)
+      console.log('F to pay', data)
       task[0].deadline = data.value.deadline
       task[0].description = data.value.description
       task[0].group = data.value.group
-      task[0].name = data.value.name
-      task[0].published = data.value.published
+      task[0].title = data.value.title
+      task[0].shown = data.value.shown
       task[0].subject = data.value.subject
       task[0].examples = data.value.examples
+      task[0].tests = data.value.tests
     },
     changeTaskPublished (state, data) {
       const task = state.tasks.filter((task) => { return task.id === data.id })
-      task[0].published = data.published
+      console.log('data', data)
+      task[0].published = data.shown
     },
     updateExamples (state, data) {
       const task = state.tasks.filter((task) => { return task.id === data.id })[0]
-      // const i = task.examples.map((item, index) => item).indexOf(data.position)
       console.log('i = ', data.position)
       task.examples.splice(data.position, 1)
-      // console.log('ex', data.tests)
-      // console.log('id', data.id)
-      // console.log('task', task.examples)
-      // delete task.examples[data.position]
-      // Reflect.deleteProperty(task.examples, data.position)
-      // // data.tests.forEach(test => { task.examples.push(test) })
-      // console.log('task', task.examples)
     }
   },
   actions: {

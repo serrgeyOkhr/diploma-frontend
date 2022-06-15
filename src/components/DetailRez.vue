@@ -1,11 +1,12 @@
 <template>
-  <div class="container" v-if="result">
+  <div class="container" v-if="rawRez">
+  <!-- <pre> {{rawRez}} </pre> -->
   <h2>Решение</h2>
     <div class="rawCode">
       <CodeEditor
         theme="light"
-        :key='result[0].id'
-        :value="result[0].code"
+        :key='Math.random()'
+        :value="rawRez.code.code"
         font_size="16px"
         width="100%"
         min_height="55vh"
@@ -14,7 +15,7 @@
       > </CodeEditor>
     </div>
     <div class="outputBox">
-      <Response :data='rawRez' />
+      <Response :data='rawRez.error' />
     </div>
   </div>
 </template>
@@ -22,6 +23,7 @@
 <script>
 /* eslint-disable no-unused-vars */
 import { ref, toRaw, toRef } from '@vue/reactivity'
+import { isNull } from 'lodash'
 import CodeEditor from 'simple-code-editor'
 import Response from './Response.vue'
 export default {
@@ -32,23 +34,24 @@ export default {
   },
   props: {
     rezId: {
-      type: Object
+      type: Object,
+      default: null
     }
   },
   setup (props) {
-    const datailResultURL = 'http://127.0.0.1:5000/detail_result'
+    const datailResultURL = 'http://100.90.100.22:5000/api/get_solution_details'
     const resp = ref(null)
     const customError = ref(null)
     const loading = ref(null)
     const resultID = toRef(props, 'rezId')
-    // const result = getResult(resultID)
-    const result = getStaticResult(resultID.value.id)
-    let rawRez
-    if (result) {
-      result[0].status = resultID.value.status
-      rawRez = toRaw(result[0])
+    const result = ref(null)
+    const rawRez = ref(null)
+    if (!isNull(resultID.value)) {
+      console.log('я тут', resultID.value)
+      getResult(resultID, rawRez)
     }
-    function getResult (resultID) {
+    // const result = getStaticResult(resultID.value.id)
+    function getResult (resultID, rawRez) {
       /** ожидаемый return:
       * [
       *   {
@@ -66,54 +69,57 @@ export default {
       */
       // console.log(resultID.value)
       const body = {
-        id: resultID.value
+        solution_id: resultID.value
       }
       // console.log('body = ', body)
       loading.value = true
       fetch(datailResultURL, {
         method: 'POST',
         mode: 'cors',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)
       })
-        .then(async (response) => { resp.value = await response.json() })
-        .then((response) => { loading.value = false })
+        .then(response => response.json())
+        .then(result => {
+          console.log('result', result)
+          rawRez.value = result
+        })
         .catch((error) => {
           customError.value = error
-          setTimeout(() => { loading.value = false }, 1000)
         })
       return toRaw(resp.value)
     }
-    function getStaticResult (resultID) {
-      console.log(resultID)
-      const results = ref([
-        {
-          id: 1,
-          failed_test: [[2, 6, 4], [4, -1, 8]],
-          output: 'long code',
-          code: "print('1')"
-        },
-        {
-          id: 2,
-          failed_test: [[2, 6, 4], [4, -1, 8]],
-          output: null,
-          code: "print('10')"
-        },
-        {
-          id: 3,
-          failed_test: null,
-          output: null,
-          code: "print('69')"
-        }
-      ])
-      if (resultID) {
-        return results.value.filter((el) => { return el.id === resultID })
-      } else {
-        return null
-      }
-    }
+    // function getStaticResult (resultID) {
+    //   console.log(resultID)
+    //   const results = ref([
+    //     {
+    //       id: 1,
+    //       failed_test: [[2, 6, 4], [4, -1, 8]],
+    //       output: 'long code',
+    //       code: "print('1')"
+    //     },
+    //     {
+    //       id: 2,
+    //       failed_test: [[2, 6, 4], [4, -1, 8]],
+    //       output: null,
+    //       code: "print('10')"
+    //     },
+    //     {
+    //       id: 3,
+    //       failed_test: null,
+    //       output: null,
+    //       code: "print('69')"
+    //     }
+    //   ])
+    //   if (resultID) {
+    //     return results.value.filter((el) => { return el.id === resultID })
+    //   } else {
+    //     return null
+    //   }
+    // }
 
     return {
       result,

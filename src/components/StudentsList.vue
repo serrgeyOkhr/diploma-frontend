@@ -1,7 +1,8 @@
 <template>
   <h1>Список студентов</h1>
+  <!-- <pre>{{ studList }}</pre> -->
   <div class="studentListContainer" v-for="(student, index) in studList" :key="index">
-    <div class="studentListElement" :class="{active: thisActiveStudent === student.id}" @click="$emit('getResult', student.id)">
+    <div class="studentListElement" :class="{active: thisActiveStudent === student.user_id}" @click="$emit('getResult', student.user_id)">
       {{student.name}}
     </div>
   </div>
@@ -17,37 +18,41 @@ export default {
     },
     activeStudent: {
       type: Number || null
+    },
+    group: {
+      type: String
     }
   },
   setup (props) {
-    const getStudentURL = '/api/getStudentList'
+    const getStudentURL = 'http://100.90.100.22:5000/api/get_solutions_by_group'
     const taskId = toRef(props, 'id')
     const thisActiveStudent = toRef(props, 'activeStudent')
+    const thisGroup = toRef(props, 'group')
     const studList = ref([])
-    const resp = ref(null)
+    // const resp = ref(null)
     const customError = ref(null)
     console.log('active', thisActiveStudent)
-    // studList.value = getStudentList(taskId)
-    studList.value = getStaticStudentList(taskId)
-    function getStaticStudentList (data) {
-      return [{
-        id: 1,
-        name: 'Сергей Вячеславович',
-        type: 1,
-        group: 'ИТ-181'
-      }, {
-        id: 2,
-        name: 'Александр Константинович',
-        type: 1,
-        group: 'ИТ-181'
-      }, {
-        id: 3,
-        name: 'Ксения Сергеевна',
-        type: 1,
-        group: 'ИТ-181'
-      }]
-    }
-    async function getStudentList (data) {
+    getStudentList(taskId, thisGroup, studList)
+    // studList.value = getStaticStudentList(taskId)
+    // function getStaticStudentList (data) {
+    //   return [{
+    //     id: 1,
+    //     name: 'Сергей Вячеславович',
+    //     type: 1,
+    //     group: 'ИТ-181'
+    //   }, {
+    //     id: 2,
+    //     name: 'Александр Константинович',
+    //     type: 1,
+    //     group: 'ИТ-181'
+    //   }, {
+    //     id: 3,
+    //     name: 'Ксения Сергеевна',
+    //     type: 1,
+    //     group: 'ИТ-181'
+    //   }]
+    // }
+    async function getStudentList (data, thisGroup) {
       /* ожидаемый return: {  responce: xxx (type: Number),
                               user: {
                                 name: 'Jon' (type: String),
@@ -57,30 +62,30 @@ export default {
                             }
       */
       const body = {
-        id: data.value.id
+        task_id: data.value,
+        group_id: thisGroup.value
       }
       // loading.value = true
-      const result = await fetch(getStudentURL, {
+      fetch(getStudentURL, {
         method: 'POST',
         mode: 'cors',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)
       })
-        .then((response) => {
-          resp.value = response.json()
-        })
-        .then((response) => {
+        .then(response => response.json())
+        .then((result) => {
           // loading.value = false
-          console.log(resp.value)
-          return resp.value
+          console.log(result)
+          studList.value = result
         })
         .catch((error) => {
           customError.value = error
         })
-      console.log(result)
-      // return ret
+      // console.log(result)
+      // return result
       // console.log(thisActiveStudent)
     }
     return {

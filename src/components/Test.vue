@@ -29,6 +29,7 @@
           :on-update="updateInputData('input', inputData)"
         >
         </n-dynamic-input>
+        <pre> {{inputData}} </pre>
       </div>
       <div class="test_outputs">
         <span :class="{testWarning: outputCheckForArray}">Выходные данные: </span>
@@ -77,21 +78,15 @@ export default {
     const curTest = tests[props.index]
     if (curTest) {
       if (typeof (curTest.input) === 'object') {
-        if (typeof (curTest.input[0]) === 'object') {
-          curTest.input.forEach(element => {
-            // console.log(JSON.stringify(element))
-            inputData.value.push((element))
-          })
-        } else {
-          inputData.value.push(JSON.stringify(curTest.input))
-        }
-        console.log(inputData.value)
+        curTest.input.forEach(element => {
+          inputData.value.push((element))
+        })
       } else {
         inputData.value.push((curTest.input))
       }
+
       if (typeof (curTest.output) === 'object') {
         curTest.output.forEach(element => {
-          // console.log((element))
           outputData.value.push((element))
         })
       } else {
@@ -102,8 +97,8 @@ export default {
     function updateInputData (type, data) {
       const task = store.state.tasks.filter((element) => { return element.id === props.taskId })
       tests = task[0].examples
-      console.log(data)
       data = toRaw(data)
+      console.log('data', data)
       data.forEach((el, index) => {
         if (el) {
           console.log(el)
@@ -112,17 +107,18 @@ export default {
 
           if (!Number.isNaN(Number(el)) && typeof (el) !== 'object') {
             el = JSON.parse(el)
-          } else if (typeof (el) === 'object') {
-            el = JSON.stringify(el)
-            // console.log('this is obj')
-          } else if (el.startsWith('[') && el.endsWith(']')) {
-            el = JSON.parse('"' + el + '"')
-            // console.log('это массив')
-            inputCheckForArray.value = false
-          } else if (el.startsWith('[') || el.endsWith(']')) {
-            // console.log('возможно, это массив')
-            inputCheckForArray.value = true
           }
+          // else if (typeof (el) === 'object') {
+          //   el = JSON.stringify(el)
+          //   // console.log('this is obj')
+          // } else if (el.startsWith('[') && el.endsWith(']')) {
+          //   el = JSON.parse('"' + el + '"')
+          //   // console.log('это массив')
+          //   inputCheckForArray.value = false
+          // } else if (el.startsWith('[') || el.endsWith(']')) {
+          //   // console.log('возможно, это массив')
+          //   inputCheckForArray.value = true
+          // }
           data[index] = el
         }
       })

@@ -1,6 +1,6 @@
 <template>
   <Header/>
-  <div v-if="userType === 1" class="container">
+  <div v-if="userType === 'student'" class="container">
     <div class="content" v-if="this.toggleView">
       <div class="subclass">
         <div class="navBar">
@@ -19,23 +19,46 @@
     <div class="content" v-else>
       <div class="subclass">
         <div class="navBar">
-          <n-button class="testButton btn" :class="{handle_active: toggleView}" @click="toggleView = true">Задание</n-button>
-          <n-button class="testButton btn" :class="{handle_active: !toggleView}"  @click="toggleView = false">Результаты</n-button>
+          <n-button
+            class="testButton btn"
+            :class="{handle_active: toggleView}"
+            @click="toggleView = true"
+          >
+            Задание
+          </n-button>
+          <n-button
+            class="testButton btn"
+            :class="{handle_active: !toggleView}"
+            @click="toggleView = false"
+          >
+            Результаты
+          </n-button>
           <div class="description">
-            <ResultList :_taskId='locTask.id' :userId='userID' @handler_click="hello" :activeID="detailTask.id" />
+            <ResultList
+              :_taskId='locTask.id'
+              :userId='userID'
+              @handler_click="hello"
+              :activeID="detailTask.id"
+            />
           </div>
         </div>
       </div>
       <div class="resultsList">
-        <DetailResult :rezId='detailTask' :key='detailTask.id'/>
+        <DetailResult :rezId='detailTask.id' :key='detailTask.id'/>
       </div>
     </div>
 
   </div>
-  <div v-if="userType === 2" class="container">
+  <div v-if="userType === 'teacher'" class="container">
     <div class="content">
       <div class="subclass">
-        <StudentsList :id='locTask.id' @getResult="changeResultView"  :activeStudent='activeStudent' :key='activeStudent' />
+        <StudentsList
+          :id='locTask.id'
+          :group='locTask.group'
+          @getResult="changeResultView"
+          :activeStudent='activeStudent'
+          :key='activeStudent'
+        />
         <div class="changeTaskButton">
           <n-button @click="changeTask()">Редактировать задание</n-button>
         </div>
@@ -43,6 +66,10 @@
       <div class="resultsList">
         <div class="">
           <ResultList v-if="activeStudent !== null" :_taskId='locTask.id' :userId='activeStudent' @handler_click="hello" :key='activeStudent' />
+        </div>
+        <div class="resultsList">
+          <!-- <h2>nen</h2> -->
+          <DetailResult :rezId='detailTask.id' :key='detailTask.id'/>
         </div>
       </div>
     </div>
@@ -77,8 +104,6 @@ export default {
     const toggleView = ref(true)
     const tasks = store.state.tasks
     const userType = store.state.user.type
-    const subjects = new Set()
-    const groups = new Set()
     const detailTask = ref({ id: null, status: null })
     const activeStudent = ref(null)
 
@@ -88,23 +113,22 @@ export default {
       return Number(task.id) === Number(route.params.id)
     })[0]
 
-    tasks.forEach(element => {
-      subjects.add(element.subject)
-      groups.add(element.group)
-    })
-    console.log(subjects, groups)
+    // console.log(subjects, groups)
     function changeTask () {
       // console.log(taskId)
       router.push({ name: 'changeTaskID', params: { id: locTask.id, task: locTask } })
     }
     function hello (data) {
+      // console.log('hello, from hello', data)
       detailTask.value.id = data.id
       detailTask.value.status = data.status
     }
     function changeResultView (id) {
       activeStudent.value = id
-      console.log('show result for user with ID = ', id)
-      console.log('active student = ', activeStudent.value)
+      detailTask.value.id = null
+      detailTask.value.status = null
+      // console.log('show result for user with ID = ', id)
+      // console.log('active student = ', activeStudent.value)
     }
     // console.log(locTask.id)
     // console.log(locTask)

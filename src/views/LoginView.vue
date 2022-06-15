@@ -4,7 +4,7 @@
       <!-- <img alt="Vue logo" src="../assets/logo.png"> -->
       <div class="container">
         <div class="placeForText">
-          <h1>СГУВТ код</h1>
+          <h1>Алгоритмы и Структуры</h1>
           <div class="description">
             <img src="../assets/logo_ssuwt.png" alt="logo_ssuwt" />
             <span> Сервис создан студентами для студентов </span>
