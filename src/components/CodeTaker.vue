@@ -37,7 +37,7 @@
 <script>
 import CodeEditor from 'simple-code-editor'
 import Response from '../components/Response.vue'
-import { ref, toRaw } from '@vue/reactivity'
+import { ref } from '@vue/reactivity'
 export default {
   name: 'code-taker',
   components: {
@@ -76,11 +76,6 @@ export default {
         label: 'Python',
         // eslint-disable-next-line no-useless-escape
         value: '[[\"python\",\"Python\"]]'
-      },
-      {
-        label: 'C#',
-        // eslint-disable-next-line no-useless-escape
-        value: '[[\"csharp\",\"C#\"]]'
       }
     ]
 
@@ -88,30 +83,27 @@ export default {
       sendSolution(formVal)
       // return formVal.value.toLowerCase()
     }
-    function getTests () {
-      const tests = props.task.examples
-      // console.log('body.spec.tests', toRaw(tests))
-      return toRaw(tests)
-    }
+    // function getTests () {
+    //   const tests = props.task.examples
+    //   // console.log('body.spec.tests', toRaw(tests))
+    //   return toRaw(tests)
+    // }
 
     function sendSolution (data) {
       const body = {
-        id: 'square',
-        spec: {
-          language: 'python',
-          code: data.value,
-          tests: getTests()
-        }
+        task_id: props.id,
+        language: JSON.parse(selectedLanguage.value)[0][0],
+        code: data.value
       }
-      const serverUrl = 'http://127.0.0.1:5000/run_code'
+      const serverUrl = 'http://100.90.100.22:5000/api/submit_solution'
       console.log(body)
       loading.value = true
       fetch(serverUrl, {
         method: 'POST',
         mode: 'cors',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
-          // 'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: JSON.stringify(body)
       })

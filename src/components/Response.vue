@@ -1,6 +1,6 @@
 <template>
   <!-- <h1>hell</h1> -->
-  <div v-if="status === 'passed'"  class="testResult">
+  <div v-if="status === 'ok'"  class="testResult">
     <h3 class="success"> Все тесты пройдены! </h3>
   </div>
   <div v-else-if="status === 'test_failed'"  class="testResult">

@@ -30,6 +30,7 @@ export default createStore({
     updateUser (state, user) {
       // console.log('from state', user)
       // console.log('state.user', state)
+      state.user.id = user.id
       state.user.name = user.name
       state.user.type = user.user_type
       state.user.group = user.group

@@ -1,117 +1,218 @@
 <template>
   <div class="containerTaskSub">
     <div class="groupContainer">
-      <div class="groupAddContainer">
-        <div class="allGroupList"> компонент список</div>
-        <div class="createGroup"> компонент форма</div>
+      <div class="allGroupList">
+        <h3>Текущие группы</h3>
+        <p v-for="(group, index) in allGroup.sort((a,b) => a.id > b.id )" :key="index">
+          {{group.id}}
+        </p>
       </div>
-      <div class="groupChangeContainer">компонент форма, данные зависят от списка </div>
+      <div class="createGroup">
+        <h3>Добавить группу</h3>
+        <n-input v-model:value="newGroupName" type="text" placeholder="Введите номер группы" />
+        <n-button @click="addNewGroup">Сохранить</n-button>
+      </div>
     </div>
     <div class="subjectContainer">
-        <div class="subjectAddContainer">
-          <div class="allSubjectList"> компонент список</div>
-          <div class="createSubject"> компонент форма</div>
+          <!-- <div class="allSubjectList"> компонент список</div> -->
+      <div class="createSubject">
+        <div class="subjectMenu">
+          <h3 @click="subjectFormShow = true"> Добавить предмет </h3>
+          <h3 class="divider"> / </h3>
+          <h3 @click="subjectFormShow = false"> Изменить предмет </h3>
         </div>
-        <div class="SubjectChangeContainer">компонент форма, данные зависят от списка </div>
+        <pre>{{subjectFormShow}}</pre>
+        <div v-if="subjectFormShow" class="subjectAddForm">
+          <n-form ref="formRef" :rules="rules" :model="newSubject">
+            <n-form-item>
+              <p>Полное название предмета</p>
+              <n-input v-model:value="newSubject.full_name" placeholder="название"/>
+            </n-form-item>
+            <n-form-item>
+              <p>Сокращенное название предмета</p>
+              <n-input v-model:value="newSubject.id" placeholder="Сокращение"/>
+            </n-form-item>
+            <n-form-item>
+              <p>Выберите преподавателя для этого предмета</p>
+              <n-select v-model:value="newSubject.teacher" :options="allTeachers"/>
+            </n-form-item>
+            <n-form-item>
+              <n-button @click="addNewSubject">Сохранить</n-button>
+            </n-form-item>
+          </n-form>
+        </div>
+        <div v-else class="subjectAddForm">
+          <n-form ref="formRef" :rules="rules" :model="changeSubject">
+            <n-form-item>
+              <p>Выберите предмет</p>
+              <n-select v-model:value="selectSubject" :options="allSubjects" @update:value="getSubjectData"/>
+            </n-form-item>
+            <!-- <pre>{{changeSubject}}</pre> -->
+            <!-- <n-form-item>
+              <p>Полное название предмета</p>
+              <n-input v-model:value="changeSubject.full_name" placeholder="название"/>
+            </n-form-item>
+            <n-form-item>
+              <p>Сокращенное название предмета</p>
+              <n-input v-model:value="changeSubject.id" placeholder="Сокращение"/>
+            </n-form-item> -->
+            <n-form-item>
+              <p>Выберите преподавателя для этого предмета</p>
+              <n-select v-model:value="changeSubject.teacher" :options="allTeachers"/>
+            </n-form-item>
+            <n-form-item>
+              <n-button @click="sendChangeSubject">Изменить</n-button>
+            </n-form-item>
+          </n-form>
+        </div>
+      </div>
+        <!-- <div class="SubjectChangeContainer">компонент форма, данные зависят от списка </div> -->
     </div>
  </div>
 </template>
 
 <script>
-import { ref, toRef } from '@vue/reactivity'
-import { useMessage } from 'naive-ui'
+import { ref } from '@vue/reactivity'
 export default {
-  name: 'create-persone',
-  props: {
-    personID: {
-      type: Number,
-      default: null
-    }
-  },
-  setup (props) {
-    const getUser = '/api/getUser'
+  name: 'create-task-sub',
+  setup () {
+    const newGroupName = ref(null)
+    const newSubject = ref(
+      {
+        full_name: '',
+        id: '',
+        teacher: null
+      }
+    )
+    const changeSubject = ref(
+      {
+        full_name: '',
+        id: '',
+        teacher: null
+      }
+    )
+    const allGroup = ref([])
+    const allSubjects = ref([])
+    const allSubject = ref([])
+    const allTeachers = ref([])
     const resp = ref(null)
-    const propsPersonID = toRef(props, 'personID')
-    const isChange = ref(propsPersonID.value !== null)
-    const message = useMessage()
     const formRef = ref(null)
-    const formGroupValue = isChange.value
-      ? getCurrentUser(propsPersonID)
-      : ref({
-        user: {
-          name: '',
-          type: null,
-          group: undefined,
-          login: '',
-          password: ''
-        }
-      })
-    const formSubjectValue = isChange.value
-      ? getCurrentUser(propsPersonID)
-      : ref({
-        user: {
-          name: '',
-          type: null,
-          group: undefined,
-          login: '',
-          password: ''
-        }
-      })
-    const userTypeOptions = ['Студент', 'Преподаватель'].map((v, index) => ({
-      label: v,
-      value: String(index + 1)
-    }))
+    const selectSubject = ref(null)
+    const subjectFormShow = ref(true)
     // const messages = {
     //   required: '%s is really really required'
     // }
-    const groupRules = {
-      user: {
-        name: {
-          required: true,
-          message: 'Необходимо ввести имя',
-          trigger: 'blur'
-        },
-        group: {
-          required: false,
-          message: 'Необходимо ввести группу',
-          trigger: 'blur'
-        },
-        login: {
-          required: true,
-          message: 'Необходимо ввести логин',
-          trigger: 'blur'
-        },
-        password: {
-          required: true,
-          message: 'Необходимо ввести пароль',
-          trigger: 'blur'
-        },
-        type: {
-          required: true,
-          trigger: ['blur', 'change']
-        }
-      }
+    getGroups(allGroup)
+    getSubjects(allSubjects, allSubject)
+    getTeachers(allTeachers)
+    console.log('allSubjects', allSubjects.value)
+    function getGroups (output) {
+      const URL = 'http://100.90.100.22:5000/api/get_groups'
+      getFromServer(URL, output)
     }
-
-    function handleValidateClick (e) {
-      e.preventDefault()
-      formRef.value?.validate((errors) => {
-        if (!errors) {
-          message.success('Valid')
-        } else {
-          console.log(errors)
-          message.error('Invalid')
+    function getSubjects (output, allSubject) {
+      const URL = 'http://100.90.100.22:5000/api/get_subjects'
+      fetch(URL, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
         }
       })
+        .then(response => response.json())
+        .then((result) => {
+          allSubject.value = result
+          result.forEach(element => {
+            console.log('element', element)
+            output.value.push({
+              label: element.full_name,
+              value: element.id
+            })
+          })
+          console.log(allSubjects.value)
+        })
+    }
+    function getTeachers (output) {
+      const URL = 'http://100.90.100.22:5000/api/get_users'
+      fetch(URL, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(response => response.json())
+        .then((result) => {
+          const teachers = result.filter((el) => { return el.user_type === 'teacher' })
+          teachers.forEach(element => {
+            output.value.push({
+              label: element.name,
+              value: element.id
+            })
+          })
+          console.log(teachers)
+        })
     }
 
-    function getCurrentUser (userID) {
+    function getFromServer (url, output) {
+      fetch(url, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(response => response.json())
+        .then((result) => {
+          output.value = result
+          console.log(result)
+        })
+    }
+    function addNewGroup (e) {
+      e.preventDefault()
+      console.log(newGroupName.value)
+      const URL = 'http://100.90.100.22:5000/api/create_group'
       const body = {
-        userID: userID
+        name: newGroupName.value
       }
-      fetch(getUser, {
+      sendToServer(URL, body)
+        .then(response => getGroups(allGroup))
+    }
+    function sendChangeSubject () {
+      const URL = 'http://100.90.100.22:5000/api/edit_subject'
+      const body = {
+        // full_name: changeSubject.value.full_name,
+        id: changeSubject.value.id,
+        teacher: changeSubject.value.teacher
+      }
+      console.log(body)
+      sendToServer(URL, body)
+    }
+    function addNewSubject (e) {
+      e.preventDefault()
+      // console.log('newSubject', newSubject.value)
+      const URL = 'http://100.90.100.22:5000/api/create_subject'
+      const body = {
+        full_name: newSubject.value.full_name,
+        id: newSubject.value.id,
+        teacher: newSubject.value.teacher
+      }
+      sendToServer(URL, body)
+    }
+    /**
+     * full_name: "Алгоритмы и структуры данных"
+     * id: "АСД"
+     * teacher: 2
+     */
+
+    async function sendToServer (URL, body) {
+      return fetch(URL, {
         method: 'POST',
         mode: 'cors',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -121,25 +222,26 @@ export default {
           resp.value = response.json()
           console.log(resp.value)
         })
-      return ref({
-        user: {
-          name: resp.value.name,
-          type: resp.value.type,
-          group: resp.value.group,
-          login: resp.value.login,
-          password: resp.value.password
-        }
-      })
+    }
+    function getSubjectData (e) {
+      // console.log('getSubjectData', e)
+      changeSubject.value = allSubject.value.filter((el) => { return el.id === e })[0]
+      console.log('changeSubject.value', changeSubject.value)
     }
     return {
-      isChange,
       formRef,
-      formGroupValue,
-      formSubjectValue,
-      userTypeOptions,
-      // messages,
-      groupRules,
-      handleValidateClick
+      newGroupName,
+      newSubject,
+      changeSubject,
+      selectSubject,
+      allTeachers,
+      allSubjects,
+      allGroup,
+      subjectFormShow,
+      addNewGroup,
+      addNewSubject,
+      getSubjectData,
+      sendChangeSubject
     }
   }
 }
@@ -160,5 +262,17 @@ export default {
 .subjectContainer {
   border: 1px solid rgb(107, 255, 107);
   display: flex;
+}
+.subjectMenu {
+  padding: 0 5px;
+  justify-content: center;
+  display: flex;
+}
+.divider{
+  margin-left: 10px;
+  margin-right: 10px;
+}
+.activeSubjectForm {
+  font-size: 24px;
 }
 </style>

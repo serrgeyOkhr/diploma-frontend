@@ -6,10 +6,16 @@
     <span class="subTitle">Пример {{index+1}}:</span>
     <div class="exampleBox">
       <span>Входные данные:</span>
-      <pre v-for='(input) in exam.input' :key="input"> {{JSON.stringify(input)}}  </pre>
-      <!-- <pre> {{JSON.stringify(exam.input)}} </pre> -->
+      <div v-if="typeof(exam.input) === 'object'">
+        <pre> {{JSON.stringify(exam.input)}}  </pre>
+      </div>
+      <div v-else>
+        <pre> {{ exam.input }}  </pre>
+      </div>
+
       <span>Выходные данные:</span>
       <pre v-for='(output) in exam.output' :key="output"> {{JSON.stringify(output)}} </pre>
+      <!-- <pre > {{String('['+exam.output+']') }} </pre> -->
     </div>
       <!-- <pre> {{taskDetails}} </pre> -->
   </div>

@@ -1,6 +1,6 @@
 <template>
  <n-form-item v-if="change" label="Выбрать пользователя">
-    <n-select v-model:value="formValue.users" :options="allUsers" />
+    <n-select v-model:value="selectedUser" :options="usersOptions" @update:value="getUserData"/>
   </n-form-item>
  <div class="createPersonContainer">
    <n-form
@@ -9,28 +9,28 @@
     :rules="rules"
     :validate-messages="messages"
   >
-    <n-form-item label="Имя" path="user.name">
-      <n-input v-model:value="formValue.user.name" placeholder="Введите имя" />
+    <n-form-item label="Имя" path="name">
+      <n-input v-model:value="formValue.name" placeholder="Введите имя" />
     </n-form-item>
-    <n-form-item label="Тип пользователя" path="user.type">
+    <n-form-item label="Тип пользователя" path="user_type">
       <n-select
-        v-model:value="formValue.user.type"
+        v-model:value="formValue.user_type"
         placeholder="Выберите тип пользователя"
         :options="userTypeOptions"
       />
     </n-form-item>
-    <n-form-item v-if="formValue.user.type === '1'" label="Группа" path="user.group">
-      <n-input v-model:value="formValue.user.group" placeholder="Введите группу" />
+    <n-form-item v-if="formValue.user_type === 'student'" label="Группа" path="group">
+      <n-input v-model:value="formValue.group" placeholder="Введите группу" />
     </n-form-item>
-    <n-form-item label="Логин" path="user.login">
-      <n-input v-model:value="formValue.user.login" placeholder="Введите логин" />
+    <n-form-item label="Логин" path="username">
+      <n-input v-model:value="formValue.username" placeholder="Введите логин" />
     </n-form-item>
-    <n-form-item label="Пароль" path="user.password">
-      <n-input v-model:value="formValue.user.password" placeholder="Введите пароль" />
+    <n-form-item label="Пароль" path="password">
+      <n-input v-model:value="formValue.password" placeholder="Введите пароль" />
     </n-form-item>
     <n-form-item>
       <n-button @click="handleValidateClick">
-        Добавить
+        Сохранить
       </n-button>
     </n-form-item>
   </n-form>
@@ -50,65 +50,86 @@ export default {
     }
   },
   setup (props) {
-    const getUser = '/api/getUser'
-    const createUser = 'http://100.90.100.22:5000/api/create_user'
-    const resp = ref(null)
     const change = toRef(props, 'isChange')
-    const personID = ref(null)
+    const getUsers = 'http://100.90.100.22:5000/api/get_users'
+    const userURL = change ? 'http://100.90.100.22:5000/api/edit_user' : 'http://100.90.100.22:5000/api/create_user'
+    const resp = ref(null)
+    // const personID = ref(null)
     const message = useMessage()
     const formRef = ref(null)
     const customError = ref(null)
-    let allUsers = []
-    const formValue = change.value
-      ? getCurrentUser(personID)
-      : ref({
-        user: {
-          name: '',
-          type: null,
-          group: undefined,
-          login: '',
-          password: ''
-        }
-      })
-    const userTypeOptions = ['Студент', 'Преподаватель'].map((v, index) => ({
-      label: v,
-      value: String(index + 1)
-    }))
-    const rules = {
+    const allUsers = ref([])
+    const usersOptions = ref([])
+    const selectedUser = ref(null)
+    getAllUsers(getUsers, allUsers, usersOptions)
+    const formValue = ref({
       user: {
-        name: {
-          required: true,
-          message: 'Необходимо ввести имя',
-          trigger: 'blur'
-        },
-        group: {
-          required: false,
-          message: 'Необходимо ввести группу',
-          trigger: 'blur'
-        },
-        login: {
-          required: true,
-          message: 'Необходимо ввести логин',
-          trigger: 'blur'
-        },
-        password: {
-          required: true,
-          message: 'Необходимо ввести пароль',
-          trigger: 'blur'
-        },
-        type: {
-          required: true,
-          trigger: ['blur', 'change']
-        }
+        name: '',
+        type: null,
+        group: undefined,
+        login: '',
+        password: undefined
+      }
+    })
+    const userTypeOptions = [{
+      label: 'Студент',
+      value: 'student'
+    },
+    {
+      label: 'Преподаватель',
+      value: 'teacher'
+    }]
+    const rules = {
+      name: {
+        required: true,
+        message: 'Необходимо ввести имя',
+        trigger: ['input', 'blur']
+      },
+      group: {
+        required: false,
+        message: 'Необходимо ввести группу',
+        trigger: ['input', 'blur']
+      },
+      username: {
+        required: true,
+        message: 'Необходимо ввести логин',
+        trigger: ['input', 'blur']
+      },
+      password: {
+        required: !change.value,
+        message: 'Необходимо ввести пароль',
+        trigger: ['input', 'blur']
+      },
+      user_type: {
+        required: true,
+        trigger: ['blur', 'change']
       }
     }
-
+    function getAllUsers (URL, allUsers, output) {
+      fetch(URL, {
+        mode: 'cors',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(response => response.json())
+        .then(result => {
+          result.forEach(element => {
+            output.value.push({
+              label: element.name,
+              value: element.id
+            })
+          })
+          allUsers.value = result
+        })
+    }
     function handleValidateClick (e) {
       e.preventDefault()
       formRef.value?.validate((errors) => {
         if (!errors) {
           message.success('Valid')
-          createNewUser(formValue.value.user)
+          createNewUser(formValue.value)
         } else {
           console.log(errors)
           message.error('Invalid')
@@ -118,15 +139,17 @@ export default {
     function createNewUser (user) {
       console.log(user)
       const body = {
+        id: user.id ? user.id : undefined,
         name: user.name,
-        type: user.type,
+        user_type: user.user_type,
         group: user.group ? user.group : undefined,
-        username: user.login,
-        password: user.password
+        username: user.username,
+        password: user.password ? user.password : undefined
       }
-      fetch(createUser, {
+      fetch(userURL, {
         method: 'POST',
         mode: 'cors',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -141,53 +164,20 @@ export default {
           console.error(customError.value)
         })
     }
-    function getCurrentUser (userID) {
-      console.log(userID)
-      if (userID.value) {
-        const body = {
-          userID: userID
-        }
-        fetch(getUser, {
-          method: 'POST',
-          mode: 'cors',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(body)
-        })
-          .then((response) => {
-            resp.value = response.json()
-            console.log(resp.value)
-          })
-        return ref({
-          user: {
-            name: resp.value.name,
-            type: resp.value.type,
-            group: resp.value.group ? resp.value.group : undefined,
-            login: resp.value.login,
-            password: 'Оставить без изменений'
-          }
-        })
-      } else {
-        allUsers = []
-        return ref({
-          users: allUsers,
-          user: {
-            name: '',
-            type: null,
-            group: undefined,
-            login: '',
-            password: ''
-          }
-        })
-      }
+    function getUserData (userID) {
+      formValue.value = allUsers.value.filter((el) => { return el.id === userID })[0]
+      console.log(formValue.value)
     }
+
     return {
       change,
       formRef,
       formValue,
       userTypeOptions,
+      usersOptions,
       allUsers,
+      selectedUser,
+      getUserData,
       // messages,
       rules,
       handleValidateClick

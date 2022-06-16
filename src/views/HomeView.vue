@@ -168,11 +168,21 @@ export default {
           'Content-Type': 'application/json'
         }
       })
-        .then(response => response.json())
+        .then((response) => {
+          if (response.status !== 200) {
+            router.push({ name: 'login' })
+          }
+          return response.json()
+        })
         .then(result => {
           console.log(result)
           resp.value = result
           console.log(resp.value)
+        })
+        .catch((error) => {
+          customError.value = error
+          console.error(customError.value)
+          return customError.value
         })
       return (resp.value)
     }

@@ -1,19 +1,20 @@
 <template>
-  <Header/>
+  <n-spin :show="showPreloader">
+    <Header/>
   <div class="container">
     <div class="taskDescription">
       <n-form ref="formRef" :rules="rules" :model="taskValue">
         <n-form-item path="title">
           <div class="taskDescriptionItem">
             <div class="taskDescriptionItemContainer">
-              <h2>Название: </h2>
+              <h2 class="changeTask_subTitle">Название: </h2>
                 <n-popover trigger="hover" raw :show-arrow="false">
                   <template #trigger>
                     <span class="itemHealper">?</span>
                   </template>
                   <div class="popoverHealper">
                     <span>
-                      Название задания. Например: Задание 1 <br> new line
+                      Название задания. Например: Задание 1
                     </span>
                   </div>
                 </n-popover>
@@ -25,8 +26,8 @@
         </div>
       </n-form-item>
         <div class="taskDescriptionItem">
-          <div>
-            <h4>Описание: </h4>
+          <div class="changeTask_subTitle_group">
+            <h4 class="changeTask_subTitle">Описание: </h4>
                 <n-popover trigger="hover" raw :show-arrow="false">
                   <template #trigger>
                     <span class="itemHealper">?</span>
@@ -44,8 +45,8 @@
         </div>
         <n-form-item path="subject">
           <div class="taskDescriptionItem">
-          <div>
-            <h4>Предмет: </h4>
+          <div class="changeTask_subTitle_group">
+            <h4 class="changeTask_subTitle">Предмет: </h4>
               <n-popover trigger="hover" raw :show-arrow="false">
                 <template #trigger>
                   <span class="itemHealper">?</span>
@@ -65,8 +66,8 @@
         </n-form-item>
         <n-form-item path="group">
         <div class="taskDescriptionItem">
-          <div>
-            <h4>Группа: </h4>
+          <div class="changeTask_subTitle_group">
+            <h4 class="changeTask_subTitle">Группа: </h4>
               <n-popover trigger="hover" raw :show-arrow="false">
                 <template #trigger>
                   <span class="itemHealper">?</span>
@@ -84,8 +85,8 @@
         </div>
         </n-form-item>
         <div class="taskDescriptionItem">
-          <div>
-            <h4>Крайний срок сдачи: </h4>
+          <div class="changeTask_subTitle_group">
+            <h4 class="changeTask_subTitle">Крайний срок сдачи: </h4>
               <n-popover trigger="hover" raw :show-arrow="false">
                 <template #trigger>
                   <span class="itemHealper">?</span>
@@ -103,29 +104,30 @@
         </div>
         </div>
         <div class="taskDescriptionItem">
-          <div>
-            <h4>Задать язык для выполнения задания: </h4>
-              <n-popover trigger="hover" raw :show-arrow="false">
-                <template #trigger>
-                  <span class="itemHealper">?</span>
-                </template>
-                <div class="popoverHealper">
-                  <span>
-                    Можно установить специфичный язык, требуемый для этого задания. Для текущего задания выбор языков будет недоступен!
-                  </span>
-                </div>
-              </n-popover>
+          <div class="changeTask_subTitle_group">
+            <h4 class="changeTask_subTitle">Задать язык для выполнения задания: </h4>
+            <n-popover trigger="hover" raw :show-arrow="false">
+              <template #trigger>
+                <span class="itemHealper">?</span>
+              </template>
+              <div class="popoverHealper">
+                <span>
+                  Можно установить специфичный язык, требуемый для этого задания. Для текущего задания выбор языков будет недоступен!
+                </span>
+              </div>
+            </n-popover>
           </div>
           <div class="taskInput">
             <n-input type="text" v-model:value="taskValue.newField" />
         </div>
         </div>
         <n-button class="save_change_btn" @click="saveTask">Сохранить задание</n-button>
-        <pre> {{taskValue}} </pre>
+        <!-- <pre> {{taskValue}} </pre> -->
       </n-form>
     </div>
       <div class="testCase">
-        <div class="tests_wrapper">
+        <n-spin :show="taskPreloader">
+          <div class="tests_wrapper">
           <div class="taskTests" v-for="(test, index) in taskValue.examples" :key="index">
           <Test
           :test='test'
@@ -136,8 +138,10 @@
         </div>
           <n-button color="#8a2be2" @click="addTest()">Добавить тест</n-button>
         </div>
+        </n-spin>
       </div>
   </div>
+  </n-spin>
 </template>
 
 <script>
@@ -146,6 +150,7 @@ import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import Header from '../components/Header.vue'
 import Test from '../components/Test.vue'
+import { useMessage } from 'naive-ui'
 export default {
   title: 'ChangeTask',
   components: {
@@ -157,8 +162,11 @@ export default {
     const URLgetSubjects = 'http://100.90.100.22:5000/api/get_subjects'
     const props = useRoute()
     const store = useStore()
+    const message = useMessage()
     const formRef = ref(null)
     const allTests = ref(null)
+    const showPreloader = ref(false)
+    const taskPreloader = ref(false)
     const tasks = store.state.tasks
     const updateTask = ref(props.params.id ? 'http://100.90.100.22:5000/api/edit_task' : 'http://100.90.100.22:5000/api/create_task')
     const rules = ref({
@@ -196,7 +204,8 @@ export default {
       })
         .then(response => response.json())
         .then(result => {
-          result.forEach((el) => {
+          const allSubjects = result.filter((el) => { return el.teacher === store.state.user.id })
+          allSubjects.forEach((el) => {
             subjects.value.push(
               {
                 label: el.full_name,
@@ -204,7 +213,7 @@ export default {
               }
             )
           })
-          // console.log(resp.value)
+          console.log('AllSubjects', result)
         })
     }
     function getGroups () {
@@ -240,6 +249,7 @@ export default {
         task_id: taskId
       }
       console.log(body)
+      taskPreloader.value = true
       sendTaskDetails(taskDetailUrl, body, output)
     }
 
@@ -255,13 +265,36 @@ export default {
       })
         .then(response => response.json())
         .then(result => {
-          console.log(result)
-          output.value.examples = result.tests
+          taskPreloader.value = false
+          console.log('Тесты пришли!', result)
+          console.log('Функция Вернула', unify(result.tests, result.examples))
+          // result.tests.input[0]
+          output.value.examples = unify(result.tests, result.examples)
+          console.log('output.value!', output.value)
           store.commit('saveNewTask', output)
         })
     }
     console.log('allTests', allTests)
-
+    function unify (uniTests, uniExamples) {
+      console.log('uniTests = ', uniTests)
+      console.log('uniExamples = ', uniExamples)
+      const es = {}
+      for (const e of uniExamples) {
+        es[e.input] = true
+      }
+      // eslint-disable-next-line no-return-assign
+      uniTests.map((t) => {
+        console.log('es[t.input] == ', es[t.input])
+        // eslint-disable-next-line no-return-assign
+        if (es[t.input] === true) {
+          t.asExample = true
+          console.log('THE T = ', t)
+        }
+        return t
+      })
+      console.log('before return', uniTests)
+      return uniTests
+    }
     if (typeof (taskValue.value.deadline) === 'string') {
       // const re = /[.]+/g
       // taskValue.value.deadline = taskValue.value.deadline.replaceAll(re, ',')
@@ -294,7 +327,22 @@ export default {
     }
 
     function sendToServer (data) {
-      console.log(data)
+      // console.log('Ожидаемый аут', data.value.examples)
+      const tests = []
+      const examples = []
+      data.value.examples.forEach(test => {
+        const e = {
+          input: test.input,
+          output: test.output.map((el) => parseLine(el))
+        }
+        tests.push(e)
+        if (test.asExample) {
+          examples.push(e)
+        }
+        // console.log(test)
+      //   test.output.forEach(out => {
+      //   })
+      })
       const body = {
         id: props.params.id ? data.value.id : null,
         title: data.value.title,
@@ -303,10 +351,11 @@ export default {
         subject: data.value.subject,
         group: data.value.group,
         shown: data.value.shown,
-        examples: JSON.stringify(data.value.examples),
-        tests: JSON.stringify(data.value.examples)
+        examples: JSON.stringify(examples),
+        tests: JSON.stringify(tests)
       }
-      console.log(body)
+      console.log('PROLOADER')
+      showPreloader.value = true
       fetch(updateTask.value, {
         method: 'POST',
         mode: 'cors',
@@ -317,8 +366,19 @@ export default {
         },
         body: JSON.stringify(body)
       })
-        .then(response => response.json())
-        .then(result => console.log(result))
+        .then(response => {
+          return response
+        })
+        .then((result) => {
+          if (result.statusText === 'OK') {
+            message.info('Задание сохранено')
+          } else {
+            message.error('Произошла ошибка')
+          }
+          console.log('STOP PROLOADER')
+          showPreloader.value = false
+        })
+        .catch(error => console.error(error))
     }
 
     function addTest () {
@@ -327,6 +387,25 @@ export default {
       } else {
         taskValue.value.examples = [{}]
       }
+    }
+
+    function parseLine (line) {
+      if (!Number.isNaN(Number(line))) {
+        line = JSON.parse(line)
+      } else if (line.startsWith('[') && line.endsWith(']')) {
+        line = JSON.parse(line)
+      } else if (line.startsWith('{') && line.endsWith('}')) {
+        line = JSON.parse(line)
+      } else if (line.startsWith('[') || line.endsWith(']')) {
+        // eslint-disable-next-line no-throw-literal
+        throw 'unclosed'
+      } else if (line.startsWith('{') || line.endsWith('}')) {
+        // eslint-disable-next-line no-throw-literal
+        throw 'unclosed'
+      } else {
+        // line = line
+      }
+      return line
     }
 
     return {
@@ -351,9 +430,11 @@ export default {
       taskValue,
       subjects,
       groups,
+      showPreloader,
+      taskPreloader,
       saveTask,
-      addTest
-      // updateData
+      addTest,
+      sendToServer
     }
   }
 
@@ -407,7 +488,8 @@ export default {
 .itemHealper{
   display: block;
   border: 1px solid;
-  /* padding: 0 5px; */
+  padding: 2px;
+  font-size: 14px;
   width: 16px;
   height: 16px;
   display: flex;
@@ -439,5 +521,13 @@ export default {
 }
 .test_wrap{
   display: flex;
+}
+.changeTask_subTitle{
+  margin: 0px;
+  padding: 10px 5px;
+}
+.changeTask_subTitle_group{
+  display: flex;
+  align-items: center;
 }
 </style>

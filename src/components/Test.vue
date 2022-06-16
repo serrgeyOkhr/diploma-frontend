@@ -4,7 +4,19 @@
   >
   <div class="test_container">
     <div class="test_header">
-      <span class="test_title">Тест {{ index + 1}} </span>
+      <div class="test_header_group">
+        <div class="test_title">Тест {{ index + 1}} </div>
+        <div class="test_asEx">
+          <n-checkbox
+          v-model:checked="useAsExample"
+          size="large"
+          font-size="18px"
+          :on-update="updateExampleData('asExample', useAsExample)"
+        >
+          <span class="fz18">Показать в качестве примера</span>
+        </n-checkbox>
+        </div>
+      </div>
       <n-button type="error" @click="removeTest(index)">Удалить</n-button>
     </div>
     <div class="test_wrap">
@@ -17,40 +29,48 @@
             </template>
             <div class="popoverHealper">
               <span>
-                  Если вы хотите задать массив, обязательно закройте скобку справа от массива
+                  Значение не соответствует формату JSON. Для справки изучите сайт <a target="blank" href="https://www.json.org/json-ru.html">JSON.ORG</a>
               </span>
             </div>
           </n-popover>
         </div>
-        <n-dynamic-input
+        <n-input
+          class="testInput"
           v-model:value="inputData"
-          item-style="border: 1px solid; border-radius: 5px; padding: 5px;"
-          :min=1
-          :on-update="updateInputData('input', inputData)"
+          @input="updateInputData('input', inputData)"
         >
-        </n-dynamic-input>
-        <pre> {{inputData}} </pre>
+        </n-input>
+        <!-- <pre> {{inputData}} </pre> -->
       </div>
       <div class="test_outputs">
-        <span :class="{testWarning: outputCheckForArray}">Выходные данные: </span>
+          <div class="test_input_title">
+            <span :class="{testWarning: outputCheckForArray}">Выходные данные: </span>
+          <n-popover trigger="hover" raw :show-arrow="false" v-if="outputCheckForArray">
+            <template #trigger>
+              <span class="itemHealper">?</span>
+            </template>
+            <div class="popoverHealper">
+              <span>
+                  Значение не соответствует формату JSON. Для справки изучите сайт <a target="blank" href="https://www.json.org/json-ru.html">JSON.ORG</a>
+              </span>
+            </div>
+          </n-popover>
+        </div>
         <n-dynamic-input
           v-model:value="outputData"
           item-style="border: 1px solid; border-radius: 5px; padding: 5px;"
           :min=1
           :on-update="updateOutputData('output',outputData)">
         </n-dynamic-input>
+         <!-- <pre> {{outputData}} </pre> -->
       </div>
     </div>
-    <!-- <div class="test_actives">
-      as example
-    </div> -->
   </div>
-  <!-- <pre>
-  </pre> -->
   </div>
 </template>
 
 <script>
+/* eslint-disable no-throw-literal */
 import { ref, toRaw } from '@vue/reactivity'
 // import { ref } from '@vue/reactivity'
 // import { ref, toRef } from '@vue/reactivity'
@@ -64,88 +84,103 @@ export default {
   },
   setup (props) {
     const store = useStore()
-    const inputData = ref([])
+    const inputData = ref('')
     const outputData = ref([])
     const inputCheckForArray = ref(false)
     const outputCheckForArray = ref(false)
+    const useAsExample = ref(false)
     let tests = []
 
     // console.log(props)
     if (props.test) {
       const task = store.state.tasks.filter((element) => { return element.id === props.taskId })
+      // console.log(task)
       tests = task[0].examples
+      console.log('tests', tests)
     }
     const curTest = tests[props.index]
+    console.log('curTest', curTest)
     if (curTest) {
-      if (typeof (curTest.input) === 'object') {
-        curTest.input.forEach(element => {
-          inputData.value.push((element))
-        })
+      if (typeof (curTest.input) !== 'string') {
+        inputData.value = (JSON.stringify(curTest.input))
       } else {
-        inputData.value.push((curTest.input))
+        inputData.value = curTest.input
       }
 
       if (typeof (curTest.output) === 'object') {
         curTest.output.forEach(element => {
-          outputData.value.push((element))
+          outputData.value.push(displayElement(element))
         })
       } else {
         outputData.value.push((curTest.output))
       }
+      useAsExample.value = curTest.asExample
+    }
+
+    function displayElement (el) {
+      if (typeof (el) === 'string') {
+        return el
+      } else if (typeof (el) === 'number') {
+        return el.toString()
+      } else {
+        return JSON.stringify(el)
+      }
     }
 
     function updateInputData (type, data) {
+      // console.log('Я тут')
       const task = store.state.tasks.filter((element) => { return element.id === props.taskId })
       tests = task[0].examples
-      data = toRaw(data)
-      console.log('data', data)
-      data.forEach((el, index) => {
-        if (el) {
-          console.log(el)
-          // console.log(typeof (el))
-          inputCheckForArray.value = false
+      inputCheckForArray.value = false
 
-          if (!Number.isNaN(Number(el)) && typeof (el) !== 'object') {
-            el = JSON.parse(el)
-          }
-          // else if (typeof (el) === 'object') {
-          //   el = JSON.stringify(el)
-          //   // console.log('this is obj')
-          // } else if (el.startsWith('[') && el.endsWith(']')) {
-          //   el = JSON.parse('"' + el + '"')
-          //   // console.log('это массив')
-          //   inputCheckForArray.value = false
-          // } else if (el.startsWith('[') || el.endsWith(']')) {
-          //   // console.log('возможно, это массив')
-          //   inputCheckForArray.value = true
-          // }
-          data[index] = el
-        }
-      })
+      try {
+        data = parseLine(data)
+      } catch {
+        inputCheckForArray.value = true
+      }
+
       tests[props.index][type] = data
+    }
+
+    function parseLine (line) {
+      if (!Number.isNaN(Number(line))) {
+        line = JSON.parse(line)
+      } else if (line.startsWith('[') && line.endsWith(']')) {
+        line = JSON.parse(line)
+      } else if (line.startsWith('{') && line.endsWith('}')) {
+        line = JSON.parse(line)
+      } else if (line.startsWith('[') || line.endsWith(']')) {
+        throw 'unclosed'
+      } else if (line.startsWith('{') || line.endsWith('}')) {
+        throw 'unclosed'
+      } else {
+        // line = line
+      }
+      return line
     }
 
     function updateOutputData (type, data) {
       const task = store.state.tasks.filter((element) => { return element.id === props.taskId })
       tests = task[0].examples
       data = toRaw(data)
-      data.forEach((el, index) => {
-        if (el) {
-          if (!Number.isNaN(Number(el)) && typeof (el) !== 'object') {
-            console.log(!Number.isNaN(Number(el)))
-            outputCheckForArray.value = false
-            el = JSON.parse(el)
-          } else if (typeof (el) === 'object') {
-            el = JSON.stringify(el)
-          } else if (el.startsWith('[') && el.endsWith(']')) {
-            el = JSON.parse('"' + el + '"')
-            outputCheckForArray.value = false
-          } else if (el.startsWith('[') || el.endsWith(']')) {
-            outputCheckForArray.value = true
-          }
-          data[index] = el
-        }
-      })
+      // console.log('outputData', data)
+      outputCheckForArray.value = false
+      try {
+        data.forEach(test => {
+          parseLine(test)
+          console.log('test', test)
+        })
+      } catch {
+        outputCheckForArray.value = true
+      }
+      tests[props.index][type] = data
+      console.log('tests[props.index][type]', tests[props.index][type])
+    }
+
+    function updateExampleData (type, data) {
+      console.log('updateExampleData', data)
+      const task = store.state.tasks.filter((element) => { return element.id === props.taskId })
+      tests = task[0].examples
       tests[props.index][type] = data
     }
 
@@ -162,7 +197,9 @@ export default {
       outputData,
       inputCheckForArray,
       outputCheckForArray,
+      useAsExample,
       updateInputData,
+      updateExampleData,
       updateOutputData,
       removeTest
     }
@@ -171,6 +208,9 @@ export default {
 </script>
 
 <style scoped>
+.fz18{
+  font-size: 18px;
+}
 .test {
   font-size: 18px;
   border: 1px solid;
@@ -178,6 +218,10 @@ export default {
   padding: 5px  10px;
   margin-bottom: 10px;
   margin-top: 5px;
+}
+.test_asEx{
+  margin-left: 20px;
+  font-size: 18px;
 }
 .itemHealper{
   border: 1px solid;
@@ -212,5 +256,21 @@ export default {
 .test_header{
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+.test_header_group{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.test_inputs{
+  width: 45%;
+}
+.testInput{
+  font-size: 18px;
+  border: 1px solid;
+  border-radius: 5px;
+  padding: 5px;
+  width: 100%;
 }
 </style>
