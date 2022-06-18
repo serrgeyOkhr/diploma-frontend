@@ -1,4 +1,5 @@
 <template>
+<n-spin :show="loading">
   <div class="home">
     <Header @adminPage="adminPage" @setTasks="setTasks" :subjects='subjects' :showSubject='showSubject' />
     <div v-if="user.type === 'admin'" class="container">
@@ -37,6 +38,7 @@
         :title="task.title"
         :description="task.description"
         :done="task.done"
+        :task="task"
         @openPage="openTask(task.id, task)"
         />
       </div>
@@ -45,16 +47,17 @@
       </div>
     </div>
   </div>
+</n-spin>
 </template>
 
 <script>
-/* eslint-disable no-unused-vars */
-import { ref, toRaw } from '@vue/reactivity'
+import { ref } from '@vue/reactivity'
 import { mapState, useStore } from 'vuex'
 import TaskCom from '../components/Task.vue'
 import Header from '../components/Header.vue'
 import Admin from '../components/Admin.vue'
 import { useRouter } from 'vue-router'
+import config from '@/config'
 
 export default {
   name: 'HomeView',
@@ -90,33 +93,33 @@ export default {
     }
   },
   async setup () {
-    const tasksUrl = 'http://100.90.100.22:5000/api/get_tasks'
     const store = useStore()
     const router = useRouter()
     const user = ref(store.state.user)
     const style = ref(store.state.style)
-    const resp = ref(null)
-    const customError = ref(null)
+    // const resp = ref(null)
+    // const customError = ref(null)
     const loading = ref(null)
     const tasks = ref(null)
     const showSettings = ref('person')
-    // const showGroupTask = ref(false)
     const subjects = new Set()
     const groupsList = new Set()
     const groups = ref([])
+    const serverTasks = ref([])
 
     if (user.value.type !== 'admin') {
-      const serverTasks = await getTasks(user)
-      // tasks.value = getStaticTasks() // СТАТИЧНЫЕ ЗАДАНИЯ
-      console.log(serverTasks)
-      if (serverTasks) {
-        serverTasks.forEach(element => {
-          subjects.add(element.subject)
-          groupsList.add(element.group)
+      getTasks(serverTasks)
+        .then((response) => {
+          // console.log(serverTasks)
+          if (serverTasks.value.length > 0) {
+            serverTasks.value.forEach(element => {
+              subjects.add(element.subject)
+              groupsList.add(element.group)
+            })
+          }
+          setData('createTasks', serverTasks.value)
+          tasks.value = serverTasks.value
         })
-      }
-      setData('createTasks', serverTasks)
-      tasks.value = serverTasks
     }
 
     groupsList.forEach((el) => {
@@ -126,8 +129,6 @@ export default {
       }
       groups.value.push(group)
     })
-
-    // setData('updateUser', store.state.user)
 
     function setData (place, data) {
       store.commit(place, data)
@@ -142,25 +143,10 @@ export default {
       groups.value[index].show = !groups.value[index].show
     }
 
-    async function getTasks (user) {
-      /** ожидаемый return:
-      * [
-      *   {
-      *     id: 1 (type: Number),
-      *     deadline: TimeStamp (type: ????),
-      *     subject: 'sub1' (type: String),
-      *     name: 'title' (type: String),
-      *     description: 'descript' (type: String),
-      *     published: true / false (type: Boolean),
-      *     group: 'IT-6969' (type: String),
-      *     examples: [{}] (type: Object),
-      *     done: true / false (type: Boolean)
-      *   }
-      * ]
-      */
-
+    async function getTasks (output) {
+      const tasksUrl = config.hostname + config.api.getTasks
       loading.value = true
-      await fetch(tasksUrl, {
+      return fetch(tasksUrl, {
         method: 'GET',
         mode: 'cors',
         credentials: 'include',
@@ -176,80 +162,12 @@ export default {
         })
         .then(result => {
           console.log(result)
-          resp.value = result
-          console.log(resp.value)
+          output.value = result
         })
         .catch((error) => {
-          customError.value = error
-          console.error(customError.value)
-          return customError.value
+          console.error(error)
         })
-      return (resp.value)
-    }
-
-    function getStaticTasks () {
-      const tasks = [{
-        id: 1,
-        deadline: '2022,05,15',
-        subject: 'Предмет 1',
-        name: 'Квадрат числа 1',
-        description: 'В этом задании требуется найти квадрат числа, поданного на вход',
-        published: true,
-        group: 'ИТ-181',
-        examples: [
-          { input: 5, output: [25] },
-          { input: 10, output: [100] },
-          { input: 0, output: [0] }
-        ],
-        done: false
-      },
-      {
-        id: 2,
-        deadline: '10.10.2022',
-        subject: 'Предмет 2',
-        name: 'Сортировка массива 2',
-        description: 'В этом задании требуется отсортировать массив. На вход программы подается массив чисел, на выход отсортированный массив по возрастанию',
-        published: true,
-        group: 'ИТ-181',
-        examples: [
-          { input: [3, 1, 2, 6, 5, 4], output: [[1, 2, 3, 4, 5, 6]] },
-          { input: [1, -1, 0], output: [[-1, 0, 1]] },
-          { input: [], output: [[]] }
-        ],
-        done: false
-      },
-      {
-        id: 3,
-        deadline: '10.10.2022',
-        subject: 'Предмет 2',
-        name: 'Сортировка массива 3',
-        description: 'В этом задании требуется отсортировать массив. На вход программы подается массив чисел, на выход отсортированный массив по возрастанию',
-        published: true,
-        group: 'ИТ-182',
-        examples: [
-          { input: [3, 1, 2, 6, 5, 4], output: [[1, 2, 3, 4, 5, 6]] },
-          { input: [1, -1, 0], output: [[-1, 0, 1]] },
-          { input: [], output: [[]] }
-        ],
-        done: false
-      },
-      {
-        id: 4,
-        deadline: '10.10.2022',
-        subject: 'Предмет 1',
-        name: 'Сортировка массива 4',
-        description: 'В этом задании требуется отсортировать массив. На вход программы подается массив чисел, на выход отсортированный массив по возрастанию',
-        published: true,
-        group: 'ИТ-182',
-        examples: [
-          { input: [3, 1, 2, 6, 5, 4], output: [[1, 2, 3, 4, 5, 6]] },
-          { input: [1, -1, 0], output: [[-1, 0, 1]] },
-          { input: [], output: [[]] }
-        ],
-        done: false
-      }
-      ]
-      return tasks
+        .finally(() => { loading.value = false })
     }
 
     function openTask (taskId, task) {
@@ -257,21 +175,16 @@ export default {
       router.push({ name: 'task', params: { id: taskId, task: task } })
     }
 
-    // console.log(JSON.parse(localStorage.getItem('User')))
-    // console.log(store.state.user)
-    // // console.log(store.state.tasks)
-    // console.log('setUp')
-    // localStorage.setItem('User', JSON.stringify(store.state.user))
     return {
       subjects,
       groupsList,
       groups,
       tasks,
+      loading,
       user,
       showSettings,
       style,
       openTask,
-      // showGroupTask,
       createTask,
       updateShow
     }

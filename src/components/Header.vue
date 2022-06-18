@@ -64,6 +64,7 @@
 import { toRef } from '@vue/reactivity'
 import { useStore } from 'vuex'
 import router from '@/router'
+import config from '@/config'
 export default {
   name: 'header-vue',
   props: {
@@ -82,7 +83,22 @@ export default {
     },
     logOut () {
       localStorage.clear()
-      router.push({ path: '/login' })
+      const URL = config.hostname + config.api.logout
+      fetch(URL, {
+        method: 'POST',
+        mode: 'cors',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(response => response.json())
+        .then(result => {
+          console.log(result)
+        })
+        .finally(() => {
+          router.push({ path: '/login' })
+        })
     }
   },
   setup (props) {

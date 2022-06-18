@@ -61,11 +61,12 @@ import { useRouter } from 'vue-router'
 import { mapState, useStore } from 'vuex'
 import { useMessage } from 'naive-ui'
 import { isNull, isUndefined } from 'lodash'
+import config from '@/config'
 
 export default {
   name: 'LoginView',
   setup () {
-    const loginUrl = 'http://100.90.100.22:5000/api/login'
+    const loginUrl = config.hostname + config.api.login
     const message = useMessage()
     const store = useStore()
     const router = useRouter()

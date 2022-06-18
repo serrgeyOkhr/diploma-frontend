@@ -1,7 +1,7 @@
 <template>
   <h1 class="taskTitle"> {{allTask.title}} </h1>
   <span class="subTitle">Описание: </span>
-  <pre class="description">{{ allTask.description.replaceAll('  ', ' ') }}</pre>
+  <pre wrap class="description">{{ allTask.description.replaceAll('  ', ' ') }}</pre>
   <div v-for="(exam, index) in taskDetails" :key="index" class="example">
     <span class="subTitle">Пример {{index+1}}:</span>
     <div class="exampleBox">
@@ -17,12 +17,19 @@
       <pre v-for='(output) in exam.output' :key="output"> {{JSON.stringify(output)}} </pre>
       <!-- <pre > {{String('['+exam.output+']') }} </pre> -->
     </div>
-      <!-- <pre> {{taskDetails}} </pre> -->
+  </div>
+  <div
+    class="exampleBox"
+    v-if="typeof(taskDetails) === 'object' && taskDetails.length === 0"
+  >
+    Примеров НЕТ
+    <!-- <pre> {{taskDetails}} </pre> -->
   </div>
 </template>
 
 <script>
 import { ref, toRef } from '@vue/reactivity'
+import config from '@/config'
 // import { useStore } from 'vuex'
 export default {
   title: 'task-description',
@@ -34,12 +41,14 @@ export default {
   setup (props) {
     const allTask = toRef(props, 'task')
     const taskId = allTask.value.id
-    const taskDetails = ref(null)
+    const taskDetails = ref([])
 
     getTaskDetails(taskId, taskDetails)
 
+    // console.log(taskDetails)
+
     function getTaskDetails (taskId, output) {
-      const taskDetailUrl = 'http://100.90.100.22:5000/api/get_task_details'
+      const taskDetailUrl = config.hostname + config.api.getTaskDetails
       const body = {
         task_id: Number(taskId)
       }

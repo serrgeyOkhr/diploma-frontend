@@ -41,6 +41,8 @@
 <script>
 import { ref, toRef } from '@vue/reactivity'
 import { useMessage } from 'naive-ui'
+import config from '@/config'
+
 export default {
   name: 'create-persone',
   props: {
@@ -51,8 +53,8 @@ export default {
   },
   setup (props) {
     const change = toRef(props, 'isChange')
-    const getUsers = 'http://100.90.100.22:5000/api/get_users'
-    const userURL = change ? 'http://100.90.100.22:5000/api/edit_user' : 'http://100.90.100.22:5000/api/create_user'
+    const getUsers = config.hostname + config.api.getUsers
+    const userURL = config.hostname + change ? config.api.editUser : config.api.createUser
     const resp = ref(null)
     // const personID = ref(null)
     const message = useMessage()

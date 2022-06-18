@@ -10,6 +10,7 @@
 
 <script>
 import { ref, toRef } from '@vue/reactivity'
+import config from '@/config'
 export default {
   name: 'student-list',
   props: {
@@ -24,7 +25,7 @@ export default {
     }
   },
   setup (props) {
-    const getStudentURL = 'http://100.90.100.22:5000/api/get_solutions_by_group'
+    const getStudentURL = config.hostname + config.api.getSolutionByGroup
     const taskId = toRef(props, 'id')
     const thisActiveStudent = toRef(props, 'activeStudent')
     const thisGroup = toRef(props, 'group')

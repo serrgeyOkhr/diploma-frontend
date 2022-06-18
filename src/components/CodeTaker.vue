@@ -1,7 +1,12 @@
 <template>
-  <div class="container">
+  <n-spin :show="loading" size="large">
+      <div class="container">
     <div class="selectors">
-      <n-select v-model:value="selectedLanguage" :options="listLanguages" />
+      <n-select
+        v-model:value="selectedLanguage"
+        :options="listLanguages"
+        @update:value="changeTemplate"
+      />
       <!-- <n-select v-model:value="value" :options="options" /> -->
     </div>
     <div class="codeForm">
@@ -28,16 +33,21 @@
     <div class="takerButton">
       <n-space>
         <!-- <n-button @click="getFormVal()">Проверить</n-button> -->
-        <n-button :loading="loading" @click="getFormVal()">Отправить</n-button>
+        <n-button :loading="checkLoading" @click="getFormVal('check')">Проверить без сохранения</n-button>
+        <n-button type=primary :loading="sendLoading" @click="getFormVal('send')">Отправить решение</n-button>
       </n-space>
     </div>
   </div>
+  </n-spin>
 </template>
 
 <script>
 import CodeEditor from 'simple-code-editor'
 import Response from '../components/Response.vue'
 import { ref } from '@vue/reactivity'
+import { useMessage } from 'naive-ui'
+import config from '@/config'
+
 export default {
   name: 'code-taker',
   components: {
@@ -59,11 +69,14 @@ export default {
   },
   setup (props) {
     const template = ref(null)
-    template.value = 'def my_function(n):\n    return n ** 2\n'
+    template.value = 'def my_function(args):\n  # Писать решение здесь \n  return ...\n}\n\n\n\n\n\n\n'
     const formVal = template
     const resp = ref(null)
     const customError = ref(null)
     const loading = ref(null)
+    const checkLoading = ref(false)
+    const sendLoading = ref(false)
+    const message = useMessage()
     // eslint-disable-next-line no-useless-escape
     const selectedLanguage = ref('[[\"python\",\"Python\"]]')
     const listLanguages = [
@@ -79,15 +92,37 @@ export default {
       }
     ]
 
-    function getFormVal () {
-      sendSolution(formVal)
+    function changeTemplate (value) {
+      // eslint-disable-next-line no-useless-escape
+      if (value === '[[\"javascript\",\"JS\"]]') {
+        template.value = 'function my_function(args) {\n  // Писать решение здесь \n  return ...\n}\n\n\n\n\n\n'
+      // eslint-disable-next-line no-useless-escape
+      } else if ((value === '[[\"python\",\"Python\"]]')) {
+        template.value = 'def my_function(args):\n  # Писать решение здесь \n  return ...\n}\n\n\n\n\n\n'
+      }
+    }
+
+    function getFormVal (status) {
+      if (status === 'send') {
+        sendSolution(formVal)
+      }
+      if (status === 'check') {
+        checkSolution(formVal)
+      }
       // return formVal.value.toLowerCase()
     }
-    // function getTests () {
-    //   const tests = props.task.examples
-    //   // console.log('body.spec.tests', toRaw(tests))
-    //   return toRaw(tests)
-    // }
+
+    function checkSolution (data) {
+      const sendURL = config.hostname + config.api.checkSolution
+      const body = {
+        task_id: props.id,
+        language: JSON.parse(selectedLanguage.value)[0][0],
+        code: data.value
+      }
+      checkLoading.value = true
+      loading.value = true
+      sendToServer(sendURL, body, checkLoading)
+    }
 
     function sendSolution (data) {
       const body = {
@@ -95,10 +130,15 @@ export default {
         language: JSON.parse(selectedLanguage.value)[0][0],
         code: data.value
       }
-      const serverUrl = 'http://100.90.100.22:5000/api/submit_solution'
+      const serverUrl = config.hostname + config.api.submitSolution
       console.log(body)
+      sendLoading.value = true
       loading.value = true
-      fetch(serverUrl, {
+      sendToServer(serverUrl, body, sendLoading)
+    }
+
+    async function sendToServer (URL, body, loader) {
+      return fetch(URL, {
         method: 'POST',
         mode: 'cors',
         credentials: 'include',
@@ -107,21 +147,42 @@ export default {
         },
         body: JSON.stringify(body)
       })
-        .then(async (response) => { resp.value = await response.json() })
-        .then((response) => { loading.value = false })
+        .then(response => {
+          console.log(response)
+          return response
+        })
+        .then((result) => {
+          console.log('Ответ пришел!')
+          resp.value = result
+          loader.value = false
+          loading.value = false
+        })
         .catch((error) => {
-          customError.value = error
-          setTimeout(() => { loading.value = false }, 1000)
+          message.error('Ошибка сервера', {
+            closable: true,
+            duration: 10000
+          })
+          message.error(String(error))
+          console.log(error)
+          resp.value = error
+        })
+        .finally(() => {
+          loader.value = false
+          loading.value = false
         })
     }
+
     return {
       formVal,
       listLanguages,
       selectedLanguage,
       resp,
-      getFormVal,
       loading,
-      customError
+      checkLoading,
+      sendLoading,
+      customError,
+      changeTemplate,
+      getFormVal
     }
   }
 }

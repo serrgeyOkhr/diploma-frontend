@@ -122,6 +122,7 @@
         </div>
         </div>
         <n-button class="save_change_btn" @click="saveTask">Сохранить задание</n-button>
+        <n-button class="checkSolutionBtn" @click="checkSolutionBtn" type="primary">Проверить задание</n-button>
         <!-- <pre> {{taskValue}} </pre> -->
       </n-form>
     </div>
@@ -151,6 +152,7 @@ import { useStore } from 'vuex'
 import Header from '../components/Header.vue'
 import Test from '../components/Test.vue'
 import { useMessage } from 'naive-ui'
+import config from '@/config'
 export default {
   title: 'ChangeTask',
   components: {
@@ -158,17 +160,16 @@ export default {
     Test
   },
   setup () {
-    const URLgetGroups = 'http://100.90.100.22:5000/api/get_groups'
-    const URLgetSubjects = 'http://100.90.100.22:5000/api/get_subjects'
+    const URLgetGroups = config.hostname + config.api.getGroups
+    const URLgetSubjects = config.hostname + config.api.getSubjects
     const props = useRoute()
     const store = useStore()
     const message = useMessage()
     const formRef = ref(null)
-    const allTests = ref(null)
     const showPreloader = ref(false)
     const taskPreloader = ref(false)
     const tasks = store.state.tasks
-    const updateTask = ref(props.params.id ? 'http://100.90.100.22:5000/api/edit_task' : 'http://100.90.100.22:5000/api/create_task')
+    const updateTask = ref(config.hostname + props.params.id ? config.api.editTask : config.api.createTask)
     const rules = ref({
       title: {
         required: true,
@@ -244,7 +245,7 @@ export default {
     }
     getTaskDetails(taskValue.value.id, taskValue)
     function getTaskDetails (taskId, output) {
-      const taskDetailUrl = 'http://100.90.100.22:5000/api/get_task_details'
+      const taskDetailUrl = config.hostname + config.api.getTaskDetails
       const body = {
         task_id: taskId
       }
@@ -266,29 +267,23 @@ export default {
         .then(response => response.json())
         .then(result => {
           taskPreloader.value = false
-          console.log('Тесты пришли!', result)
-          console.log('Функция Вернула', unify(result.tests, result.examples))
-          // result.tests.input[0]
           output.value.examples = unify(result.tests, result.examples)
-          console.log('output.value!', output.value)
           store.commit('saveNewTask', output)
         })
+        .finally(() => {
+          taskPreloader.value = false
+        })
     }
-    console.log('allTests', allTests)
     function unify (uniTests, uniExamples) {
-      console.log('uniTests = ', uniTests)
-      console.log('uniExamples = ', uniExamples)
       const es = {}
       for (const e of uniExamples) {
         es[e.input] = true
       }
       // eslint-disable-next-line no-return-assign
       uniTests.map((t) => {
-        console.log('es[t.input] == ', es[t.input])
         // eslint-disable-next-line no-return-assign
         if (es[t.input] === true) {
           t.asExample = true
-          console.log('THE T = ', t)
         }
         return t
       })
@@ -326,6 +321,9 @@ export default {
       })
     }
 
+    function checkSolutionBtn () {
+      console.log('Проверка задания')
+    }
     function sendToServer (data) {
       // console.log('Ожидаемый аут', data.value.examples)
       const tests = []
@@ -434,6 +432,7 @@ export default {
       taskPreloader,
       saveTask,
       addTest,
+      checkSolutionBtn,
       sendToServer
     }
   }

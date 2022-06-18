@@ -26,6 +26,7 @@
 
 <script>
 import { ref, toRef } from '@vue/reactivity'
+import config from '@/config'
 // import { isNull } from 'lodash'
 export default {
   name: 'result-list',
@@ -41,7 +42,7 @@ export default {
     }
   },
   setup (props) {
-    const rezUrl = 'http://100.90.100.22:5000/api/get_solutions_by_user'
+    const rezUrl = config.hostname + config.api.getSolutionByUser
     const taskId = toRef(props, '_taskId')
     const user = toRef(props, 'userId')
     const active = toRef(props, 'activeID')

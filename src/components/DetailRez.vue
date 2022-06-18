@@ -26,6 +26,7 @@ import { ref, toRaw, toRef } from '@vue/reactivity'
 import { isNull } from 'lodash'
 import CodeEditor from 'simple-code-editor'
 import Response from './Response.vue'
+import config from '@/config'
 export default {
   name: 'detail-result',
   components: {
@@ -39,7 +40,7 @@ export default {
     }
   },
   setup (props) {
-    const datailResultURL = 'http://100.90.100.22:5000/api/get_solution_details'
+    const datailResultURL = config.hostname + config.api.getSolutionDetails
     const resp = ref(null)
     const customError = ref(null)
     const loading = ref(null)

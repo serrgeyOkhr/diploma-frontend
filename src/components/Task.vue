@@ -1,12 +1,18 @@
 <template>
   <div class="container" :class="{already_done: done}">
     <div class="task_text" @click="$emit('openPage')">
-      <h4 class="task_title"> {{title}}</h4>
+      <div class="task_title_box">
+        <h4 class="task_title"> {{title}}</h4>
+        <span
+        v-if='!done'
+        :class="{toLate: rawTime <= Date.parse(new Date())}"
+        > Сдать до: {{ deadline.toLocaleDateString() }}</span>
+      </div>
       <p class="description"> {{trimDescription}} </p>
     </div>
     <div class="icon_box"
-    @click="changeVis()"
     v-if='published !== undefined'
+    @click="changeVis()"
     >
       <n-icon v-if='visible' size="40">
         <Eye  />
@@ -27,6 +33,7 @@
 import { Eye, EyeOff, Checkmark } from '@vicons/ionicons5'
 import { ref, toRef } from '@vue/reactivity'
 import { useStore } from 'vuex'
+import config from '@/config'
 export default {
   name: 'TaskCom',
   components: {
@@ -50,29 +57,30 @@ export default {
     }
   },
   setup (props) {
-    const updateTask = 'http://100.90.100.22:5000/api/edit_task'
-    const visible = ref(props.published)
-    const taskId = toRef(props, 'id')
-    const thisTask = toRef(props, 'task')
-    const toMuch = ref(props.description.substring(130))
-    let trimDescription = ref(props.description)
-    const store = useStore()
     const resp = ref(null)
-    // console.log('proos', toMuch)
+    const updateTask = config.hostname + config.api.editTask
+    const thisTask = toRef(props, 'task')
+    const visible = ref(thisTask.value.shown)
+    const taskId = ref(thisTask.value.id)
+    const toMuch = ref(thisTask.value.description.substring(130))
+    const trimDescription = ref(thisTask.value.description)
+    const store = useStore()
+    // console.log('props', thisTask)
+    const rawTime = Date.parse(thisTask.value.deadline)
+    const deadline = new Date(Date.parse(thisTask.value.deadline))
+    // console.log(Date.parse(thisTask.value.deadline))
+    // console.log(Date.parse(new Date()))
+
+    if (toMuch.value) {
+      trimDescription.value = trimDescription.value.substring(0, 130) + '...'
+    }
+
     function changeVis () {
+      // console.log(visible)
       visible.value = !visible.value
       const data = {
         id: taskId.value,
         shown: visible.value
-      }
-      const body = {
-        deadline: thisTask.value.deadline,
-        description: thisTask.value.description,
-        group: thisTask.value.group,
-        id: taskId.value,
-        shown: visible.value,
-        subject: thisTask.value.subject,
-        title: thisTask.value.title
       }
       store.commit('changeTaskPublished', data)
       console.log('data = ', data)
@@ -83,7 +91,7 @@ export default {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(body)
+        body: JSON.stringify(data)
       })
         .then(response => response.json())
         .then(result => {
@@ -92,12 +100,11 @@ export default {
           console.log(resp.value)
         })
     }
-    if (toMuch.value) {
-      trimDescription = props.description.substring(0, 130) + '...'
-    }
     return {
       visible,
       trimDescription,
+      deadline,
+      rawTime,
       changeVis
     }
   }
@@ -126,13 +133,13 @@ export default {
 }
 .task_text{
   display: flex;
+  width: 100%;
   flex-direction: column;
   cursor: pointer;
   text-align: left;
 }
 .task_title{
-  margin-bottom: 10px;
-  margin-top: 5px;
+  margin: 0
 }
 .description{
   margin-top: 0;
@@ -140,5 +147,17 @@ export default {
 .already_done{
   background-color: rgb(209, 209, 209);
   opacity: 0.9;
+}
+.task_title_box{
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  margin-bottom: 10px;
+  margin-top: 5px;
+}
+.toLate{
+  font-weight: bold;
+  color: red;
 }
 </style>

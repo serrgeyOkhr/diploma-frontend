@@ -7,13 +7,15 @@
           <n-button class="testButton btn" :class="{handle_active: toggleView}" @click="toggleView = true">Задание</n-button>
           <n-button class="testButton btn" :class="{handle_active: !toggleView}"  @click="toggleView = false">Результаты</n-button>
           <div class="description">
-          <TaskDescription :task=locTask />
+            <TaskDescription :task='locTask' />
           </div>
         </div>
       </div>
-      <div class="codeTaker">
-        <CodeTaker :id=locTask.id :task=locTask />
-      </div>
+      <!-- <n-message-provider :placement="bottom-right"> -->
+        <div class="codeTaker">
+          <CodeTaker :id=locTask.id :task='locTask' />
+        </div>
+      <!-- </n-message-provider > -->
     </div>
 
     <div class="content" v-else>

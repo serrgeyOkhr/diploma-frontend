@@ -73,6 +73,7 @@
 
 <script>
 import { ref } from '@vue/reactivity'
+import config from '@/config'
 export default {
   name: 'create-task-sub',
   setup () {
@@ -106,12 +107,13 @@ export default {
     getSubjects(allSubjects, allSubject)
     getTeachers(allTeachers)
     console.log('allSubjects', allSubjects.value)
+
     function getGroups (output) {
-      const URL = 'http://100.90.100.22:5000/api/get_groups'
+      const URL = config.hostname + config.api.getGroups
       getFromServer(URL, output)
     }
     function getSubjects (output, allSubject) {
-      const URL = 'http://100.90.100.22:5000/api/get_subjects'
+      const URL = config.hostname + config.api.getSubjects
       fetch(URL, {
         method: 'GET',
         mode: 'cors',
@@ -134,7 +136,7 @@ export default {
         })
     }
     function getTeachers (output) {
-      const URL = 'http://100.90.100.22:5000/api/get_users'
+      const URL = config.hostname + config.api.getUsers
       fetch(URL, {
         method: 'GET',
         mode: 'cors',
@@ -174,7 +176,7 @@ export default {
     function addNewGroup (e) {
       e.preventDefault()
       console.log(newGroupName.value)
-      const URL = 'http://100.90.100.22:5000/api/create_group'
+      const URL = config.hostname + config.api.createGroup
       const body = {
         name: newGroupName.value
       }
@@ -182,7 +184,7 @@ export default {
         .then(response => getGroups(allGroup))
     }
     function sendChangeSubject () {
-      const URL = 'http://100.90.100.22:5000/api/edit_subject'
+      const URL = config.hostname + config.api.editSubject
       const body = {
         // full_name: changeSubject.value.full_name,
         id: changeSubject.value.id,
@@ -194,7 +196,7 @@ export default {
     function addNewSubject (e) {
       e.preventDefault()
       // console.log('newSubject', newSubject.value)
-      const URL = 'http://100.90.100.22:5000/api/create_subject'
+      const URL = config.hostname + config.api.createSubject
       const body = {
         full_name: newSubject.value.full_name,
         id: newSubject.value.id,
