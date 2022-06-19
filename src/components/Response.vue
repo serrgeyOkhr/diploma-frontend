@@ -48,7 +48,7 @@ export default {
     }
   },
   data (props) {
-    console.log(props.data)
+    // console.log(props.data)
     return {
       // response: JSON.parse(props.data),
       status: props.data ? props.data.status : '',

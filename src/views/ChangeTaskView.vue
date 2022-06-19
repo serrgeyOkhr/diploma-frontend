@@ -121,8 +121,19 @@
             <n-input type="text" v-model:value="taskValue.newField" />
         </div>
         </div>
-        <n-button class="save_change_btn" @click="saveTask">Сохранить задание</n-button>
-        <n-button class="checkSolutionBtn" @click="checkSolutionBtn" type="primary">Проверить задание</n-button>
+        <div class="changeTaskButtonGroup">
+          <n-button class="save_change_btn" @click="saveTask">Сохранить задание</n-button>
+          <n-button v-if="propsID" class="checkSolutionBtn" @click="checkSolutionBtn" type="primary">Проверить задание</n-button>
+          <!-- <n-button v-else disabled class="checkSolutionBtn" @click="checkSolutionBtn" type="primary">Проверить задание</n-button> -->
+          <n-tooltip v-else>
+            <template #trigger>
+              <n-button disabled class="checkSolutionBtn" type="primary">
+                Проверить задание
+              </n-button>
+            </template>
+            Сохраните задание и перейдите на страницу редактирования задания
+          </n-tooltip>
+        </div>
         <!-- <pre> {{taskValue}} </pre> -->
       </n-form>
     </div>
@@ -143,21 +154,41 @@
       </div>
   </div>
   </n-spin>
+    <n-modal
+      v-model:show="showModal"
+      class="custom-card"
+      preset="card"
+      :style="bodyStyle"
+      title="Проверка прохождения тестов"
+      :bordered="false"
+      size="huge"
+      :segmented="segmented"
+    >
+      <!-- <template #header-extra>
+        Oops!
+      </template> -->
+        <!-- <div class="modal"> -->
+          <CodeTakerVue :userType="'teacher'" :id="taskValue.id"/>
+        <!-- </div> -->
+    </n-modal>
+
 </template>
 
 <script>
 import { ref } from '@vue/reactivity'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import Header from '../components/Header.vue'
 import Test from '../components/Test.vue'
+import CodeTakerVue from '@/components/CodeTaker.vue'
 import { useMessage } from 'naive-ui'
 import config from '@/config'
 export default {
   title: 'ChangeTask',
   components: {
     Header,
-    Test
+    Test,
+    CodeTakerVue
   },
   setup () {
     const URLgetGroups = config.hostname + config.api.getGroups
@@ -165,11 +196,16 @@ export default {
     const props = useRoute()
     const store = useStore()
     const message = useMessage()
+    const router = useRouter()
     const formRef = ref(null)
+    const showModal = ref(false)
     const showPreloader = ref(false)
     const taskPreloader = ref(false)
+    const propsID = props.params.id ? props.params.id : undefined
     const tasks = store.state.tasks
-    const updateTask = ref(config.hostname + props.params.id ? config.api.editTask : config.api.createTask)
+    const updateTask = ref(config.hostname + (props.params.id !== undefined ? config.api.editTask : config.api.createTask))
+    // console.log(props.params.id !== undefined)
+    // console.log('URL', updateTask.value)
     const rules = ref({
       title: {
         required: true,
@@ -214,7 +250,7 @@ export default {
               }
             )
           })
-          console.log('AllSubjects', result)
+          // console.log('AllSubjects', result)
         })
     }
     function getGroups () {
@@ -249,7 +285,7 @@ export default {
       const body = {
         task_id: taskId
       }
-      console.log(body)
+      // console.log(body)
       taskPreloader.value = true
       sendTaskDetails(taskDetailUrl, body, output)
     }
@@ -287,13 +323,13 @@ export default {
         }
         return t
       })
-      console.log('before return', uniTests)
+      // console.log('before return', uniTests)
       return uniTests
     }
     if (typeof (taskValue.value.deadline) === 'string') {
       // const re = /[.]+/g
       // taskValue.value.deadline = taskValue.value.deadline.replaceAll(re, ',')
-      console.log(taskValue.value.deadline)
+      // console.log(taskValue.value.deadline)
       // console.log(Date.parse(taskValue.value.deadline))
       taskValue.value.deadline = Date.parse(taskValue.value.deadline)
     }
@@ -308,7 +344,7 @@ export default {
       const lastId = idArr.sort().pop()
       newTask.id = String(Number(lastId) + 1)
       setData('addNewTasks', newTask)
-      console.log('Biggest one', lastId)
+      // console.log('Biggest one', lastId)
       return newTask
     }
     // console.log('дед лайн', taskValue.value.deadline)
@@ -322,7 +358,8 @@ export default {
     }
 
     function checkSolutionBtn () {
-      console.log('Проверка задания')
+      showModal.value = true
+      // console.log('Проверка задания')
     }
     function sendToServer (data) {
       // console.log('Ожидаемый аут', data.value.examples)
@@ -352,7 +389,7 @@ export default {
         examples: JSON.stringify(examples),
         tests: JSON.stringify(tests)
       }
-      console.log('PROLOADER')
+      // console.log('PROLOADER')
       showPreloader.value = true
       fetch(updateTask.value, {
         method: 'POST',
@@ -370,10 +407,13 @@ export default {
         .then((result) => {
           if (result.statusText === 'OK') {
             message.info('Задание сохранено')
+            if (props.params.id === undefined) {
+              router.push('/')
+            }
           } else {
             message.error('Произошла ошибка')
           }
-          console.log('STOP PROLOADER')
+          // console.log('STOP PROLOADER')
           showPreloader.value = false
         })
         .catch(error => console.error(error))
@@ -429,6 +469,8 @@ export default {
       subjects,
       groups,
       showPreloader,
+      propsID,
+      showModal,
       taskPreloader,
       saveTask,
       addTest,
@@ -458,9 +500,8 @@ export default {
 .taskDescriptionItemContainer{
   display: flex;
 }
-.save_change_btn {
-  margin-top: 10px;
-}
+/* .save_change_btn {
+} */
 .testDescriptionDynamic{
   max-width: 70%;
   word-wrap: break-word;
@@ -528,5 +569,15 @@ export default {
 .changeTask_subTitle_group{
   display: flex;
   align-items: center;
+}
+.changeTaskButtonGroup{
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal {
+  display: flex;
+  width: 90%;
 }
 </style>

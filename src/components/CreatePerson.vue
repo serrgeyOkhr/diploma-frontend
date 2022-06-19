@@ -54,7 +54,8 @@ export default {
   setup (props) {
     const change = toRef(props, 'isChange')
     const getUsers = config.hostname + config.api.getUsers
-    const userURL = config.hostname + change ? config.api.editUser : config.api.createUser
+    const userURL = config.hostname + (change.value ? config.api.editUser : config.api.createUser)
+    // console.log('URL', userURL)
     const resp = ref(null)
     // const personID = ref(null)
     const message = useMessage()
@@ -133,13 +134,13 @@ export default {
           message.success('Valid')
           createNewUser(formValue.value)
         } else {
-          console.log(errors)
+          // console.log(errors)
           message.error('Invalid')
         }
       })
     }
     function createNewUser (user) {
-      console.log(user)
+      // console.log(user)
       const body = {
         id: user.id ? user.id : undefined,
         name: user.name,
@@ -159,16 +160,16 @@ export default {
       })
         .then((response) => {
           resp.value = response.json()
-          console.log(resp.value)
+          // console.log(resp.value)
         })
         .catch((error) => {
           customError.value = error
-          console.error(customError.value)
+          // console.error(customError.value)
         })
     }
     function getUserData (userID) {
       formValue.value = allUsers.value.filter((el) => { return el.id === userID })[0]
-      console.log(formValue.value)
+      // console.log(formValue.value)
     }
 
     return {

@@ -30,29 +30,9 @@ export default {
     const thisActiveStudent = toRef(props, 'activeStudent')
     const thisGroup = toRef(props, 'group')
     const studList = ref([])
-    // const resp = ref(null)
     const customError = ref(null)
-    console.log('active', thisActiveStudent)
+    // console.log('active', thisActiveStudent)
     getStudentList(taskId, thisGroup, studList)
-    // studList.value = getStaticStudentList(taskId)
-    // function getStaticStudentList (data) {
-    //   return [{
-    //     id: 1,
-    //     name: 'Сергей Вячеславович',
-    //     type: 1,
-    //     group: 'ИТ-181'
-    //   }, {
-    //     id: 2,
-    //     name: 'Александр Константинович',
-    //     type: 1,
-    //     group: 'ИТ-181'
-    //   }, {
-    //     id: 3,
-    //     name: 'Ксения Сергеевна',
-    //     type: 1,
-    //     group: 'ИТ-181'
-    //   }]
-    // }
     async function getStudentList (data, thisGroup) {
       /* ожидаемый return: {  responce: xxx (type: Number),
                               user: {
@@ -79,7 +59,7 @@ export default {
         .then(response => response.json())
         .then((result) => {
           // loading.value = false
-          console.log(result)
+          // console.log(result)
           studList.value = result
         })
         .catch((error) => {

@@ -94,7 +94,7 @@ export default {
       })
         .then(response => response.json())
         .then(result => {
-          console.log(result)
+          // console.log(result)
         })
         .finally(() => {
           router.push({ path: '/login' })

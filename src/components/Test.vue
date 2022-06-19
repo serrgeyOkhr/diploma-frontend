@@ -96,10 +96,10 @@ export default {
       const task = store.state.tasks.filter((element) => { return element.id === props.taskId })
       // console.log(task)
       tests = task[0].examples
-      console.log('tests', tests)
+      // console.log('tests', tests)
     }
     const curTest = tests[props.index]
-    console.log('curTest', curTest)
+    // console.log('curTest', curTest)
     if (curTest) {
       if (typeof (curTest.input) !== 'string') {
         inputData.value = (JSON.stringify(curTest.input))
@@ -168,17 +168,17 @@ export default {
       try {
         data.forEach(test => {
           parseLine(test)
-          console.log('test', test)
+          // console.log('test', test)
         })
       } catch {
         outputCheckForArray.value = true
       }
       tests[props.index][type] = data
-      console.log('tests[props.index][type]', tests[props.index][type])
+      // console.log('tests[props.index][type]', tests[props.index][type])
     }
 
     function updateExampleData (type, data) {
-      console.log('updateExampleData', data)
+      // console.log('updateExampleData', data)
       const task = store.state.tasks.filter((element) => { return element.id === props.taskId })
       tests = task[0].examples
       tests[props.index][type] = data

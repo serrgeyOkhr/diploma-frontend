@@ -39,7 +39,7 @@ export default createStore({
       state.tasks = []
       if (data) {
         data.forEach(element => {
-          console.log(element)
+          // console.log(element)
           state.tasks.push(element)
         })
       }
@@ -49,7 +49,7 @@ export default createStore({
     },
     saveNewTask (state, data) {
       const task = state.tasks.filter((task) => { return task.id === data.value.id })
-      console.log('F to pay', data)
+      // console.log('F to pay', data)
       task[0].deadline = data.value.deadline
       task[0].description = data.value.description
       task[0].group = data.value.group
@@ -61,12 +61,12 @@ export default createStore({
     },
     changeTaskPublished (state, data) {
       const task = state.tasks.filter((task) => { return task.id === data.id })
-      console.log('data', data)
+      // console.log('data', data)
       task[0].published = data.shown
     },
     updateExamples (state, data) {
       const task = state.tasks.filter((task) => { return task.id === data.id })[0]
-      console.log('i = ', data.position)
+      // console.log('i = ', data.position)
       task.examples.splice(data.position, 1)
     }
   },

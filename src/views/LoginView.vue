@@ -118,7 +118,7 @@ export default {
         })
         .then((response) => {
           loading.value = false
-          console.log(resp.value)
+          // console.log(resp.value)
           return resp.value
         })
         .catch((error) => {

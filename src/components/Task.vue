@@ -83,7 +83,7 @@ export default {
         shown: visible.value
       }
       store.commit('changeTaskPublished', data)
-      console.log('data = ', data)
+      // console.log('data = ', data)
       fetch(updateTask, {
         method: 'POST',
         mode: 'cors',
@@ -95,9 +95,9 @@ export default {
       })
         .then(response => response.json())
         .then(result => {
-          console.log(result)
+          // console.log(result)
           resp.value = result
-          console.log(resp.value)
+          // console.log(resp.value)
         })
     }
     return {

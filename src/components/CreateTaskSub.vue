@@ -1,40 +1,40 @@
 <template>
-  <div class="containerTaskSub">
-    <div class="groupContainer">
+  <div class="containerTaskSub addForm" >
+    <div class="groupContainer " >
       <div class="allGroupList">
         <h3>Текущие группы</h3>
-        <p v-for="(group, index) in allGroup.sort((a,b) => a.id > b.id )" :key="index">
+        <p class="group_list" v-for="(group, index) in allGroup.sort((a,b) => a.id > b.id )" :key="index">
           {{group.id}}
         </p>
       </div>
       <div class="createGroup">
         <h3>Добавить группу</h3>
-        <n-input v-model:value="newGroupName" type="text" placeholder="Введите номер группы" />
+        <n-input class="addGroupInput" v-model:value="newGroupName" type="text" placeholder="Введите номер группы" />
         <n-button @click="addNewGroup">Сохранить</n-button>
       </div>
     </div>
-    <div class="subjectContainer">
+    <div class="subjectContainer addForm">
           <!-- <div class="allSubjectList"> компонент список</div> -->
       <div class="createSubject">
         <div class="subjectMenu">
-          <h3 @click="subjectFormShow = true"> Добавить предмет </h3>
+          <h3 class="subjectMenu_title" :class="{active_title: subjectFormShow}" @click="subjectFormShow = true"> Добавить предмет </h3>
           <h3 class="divider"> / </h3>
-          <h3 @click="subjectFormShow = false"> Изменить предмет </h3>
+          <h3 class="subjectMenu_title" :class="{active_title: !subjectFormShow}" @click="subjectFormShow = false"> Изменить предмет </h3>
         </div>
-        <pre>{{subjectFormShow}}</pre>
+        <!-- <pre>{{subjectFormShow}}</pre> -->
         <div v-if="subjectFormShow" class="subjectAddForm">
           <n-form ref="formRef" :rules="rules" :model="newSubject">
             <n-form-item>
               <p>Полное название предмета</p>
-              <n-input v-model:value="newSubject.full_name" placeholder="название"/>
+              <n-input class="addGroupInput" v-model:value="newSubject.full_name" placeholder="Название"/>
             </n-form-item>
             <n-form-item>
               <p>Сокращенное название предмета</p>
-              <n-input v-model:value="newSubject.id" placeholder="Сокращение"/>
+              <n-input class="addGroupInput" v-model:value="newSubject.id" placeholder="Сокращение"/>
             </n-form-item>
             <n-form-item>
               <p>Выберите преподавателя для этого предмета</p>
-              <n-select v-model:value="newSubject.teacher" :options="allTeachers"/>
+              <n-select class="addGroupInput" v-model:value="newSubject.teacher" :options="allTeachers"/>
             </n-form-item>
             <n-form-item>
               <n-button @click="addNewSubject">Сохранить</n-button>
@@ -44,8 +44,8 @@
         <div v-else class="subjectAddForm">
           <n-form ref="formRef" :rules="rules" :model="changeSubject">
             <n-form-item>
-              <p>Выберите предмет</p>
-              <n-select v-model:value="selectSubject" :options="allSubjects" @update:value="getSubjectData"/>
+              <p class="mr20">Выберите предмет</p>
+              <n-select class="addGroupInput" v-model:value="selectSubject" :options="allSubjects" @update:value="getSubjectData"/>
             </n-form-item>
             <!-- <pre>{{changeSubject}}</pre> -->
             <!-- <n-form-item>
@@ -58,7 +58,7 @@
             </n-form-item> -->
             <n-form-item>
               <p>Выберите преподавателя для этого предмета</p>
-              <n-select v-model:value="changeSubject.teacher" :options="allTeachers"/>
+              <n-select class="addGroupInput" v-model:value="changeSubject.teacher" :options="allTeachers"/>
             </n-form-item>
             <n-form-item>
               <n-button @click="sendChangeSubject">Изменить</n-button>
@@ -106,7 +106,7 @@ export default {
     getGroups(allGroup)
     getSubjects(allSubjects, allSubject)
     getTeachers(allTeachers)
-    console.log('allSubjects', allSubjects.value)
+    // console.log('allSubjects', allSubjects.value)
 
     function getGroups (output) {
       const URL = config.hostname + config.api.getGroups
@@ -126,13 +126,13 @@ export default {
         .then((result) => {
           allSubject.value = result
           result.forEach(element => {
-            console.log('element', element)
+            // console.log('element', element)
             output.value.push({
               label: element.full_name,
               value: element.id
             })
           })
-          console.log(allSubjects.value)
+          // console.log(allSubjects.value)
         })
     }
     function getTeachers (output) {
@@ -154,7 +154,7 @@ export default {
               value: element.id
             })
           })
-          console.log(teachers)
+          // console.log(teachers)
         })
     }
 
@@ -170,12 +170,12 @@ export default {
         .then(response => response.json())
         .then((result) => {
           output.value = result
-          console.log(result)
+          // console.log(result)
         })
     }
     function addNewGroup (e) {
       e.preventDefault()
-      console.log(newGroupName.value)
+      // console.log(newGroupName.value)
       const URL = config.hostname + config.api.createGroup
       const body = {
         name: newGroupName.value
@@ -190,7 +190,7 @@ export default {
         id: changeSubject.value.id,
         teacher: changeSubject.value.teacher
       }
-      console.log(body)
+      // console.log(body)
       sendToServer(URL, body)
     }
     function addNewSubject (e) {
@@ -222,13 +222,13 @@ export default {
       })
         .then((response) => {
           resp.value = response.json()
-          console.log(resp.value)
+          // console.log(resp.value)
         })
     }
     function getSubjectData (e) {
       // console.log('getSubjectData', e)
       changeSubject.value = allSubject.value.filter((el) => { return el.id === e })[0]
-      console.log('changeSubject.value', changeSubject.value)
+      // console.log('changeSubject.value', changeSubject.value)
     }
     return {
       formRef,
@@ -253,28 +253,63 @@ export default {
 .containerTaskSub {
   /* width: 100%; */
   display: flex;
-  flex-direction: row;
-  flex-shrink: 1;
-  border: 2px solid red;
+  /* justify-content: center; */
+  /* flex-direction: row; */
+  /* flex-shrink: 1; */
+  /* border: 2px solid red; */
 }
 .groupContainer {
   display: flex;
-  border: 1px solid;
+  justify-content: space-between;
+  /* border: 1px solid; */
 }
 .subjectContainer {
-  border: 1px solid rgb(107, 255, 107);
+  /* border: 1px solid rgb(107, 255, 107); */
   display: flex;
+  justify-content: center;
+}
+.mr20{
+  margin-right: 20px;
 }
 .subjectMenu {
   padding: 0 5px;
   justify-content: center;
   display: flex;
+  align-items: center;
+}
+.subjectMenu_title{
+  font-size: 20px;
+  cursor: pointer;
+  color: gray;
+}
+.active_title{
+  color: black;
+  font-size: 22px;
+}
+.group_list{
+  margin-bottom: 0;
+  margin-top: 5px;
 }
 .divider{
   margin-left: 10px;
   margin-right: 10px;
+  font-size: 22px;
 }
 .activeSubjectForm {
   font-size: 24px;
+}
+.allGroupList{
+  text-align: left;
+}
+.addGroupInput{
+  text-align: left;
+  margin: 5px 0;
+  /* margin-left: 15px; */
+  border: 1px solid;
+  max-width: 250px;
+}
+.subjectAddForm{
+  text-align: left;
+  font-size: 16px;
 }
 </style>

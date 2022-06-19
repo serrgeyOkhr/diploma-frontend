@@ -1,36 +1,58 @@
 <template>
-<n-spin :show="loading">
-  <div class="home">
-    <Header @adminPage="adminPage" @setTasks="setTasks" :subjects='subjects' :showSubject='showSubject' />
-    <div v-if="user.type === 'admin'" class="container">
-      <Admin :showSettings='showSettings' />
-    </div>
-    <div v-else class="container">
-      <div class="taskBar" v-if="user.type === 'teacher'">
-        <div class="taskBarContent" v-for='(group, index) in groups' :key='index'>
-          <h2 class=group_header v-if="user.type === 'teacher' && groups.length >= 1" @click="updateShow(index)"> {{ group.title }} </h2>
-          <div class="groupTasks">
-            <TaskCom
-            v-for='(task, index) in showTask(group.title)'
-            :id='task.id'
-            :key='index'
-            :title="task.title"
-            :description="task.description"
-            :published="task.shown"
-            :task="task"
-            @openPage="openTask(task.id, task)"
-            />
-          </div>
+  <n-spin :show="loading">
+    <div class="home">
+      <Header
+        @adminPage="adminPage"
+        @setTasks="setTasks"
+        :subjects='subjects'
+        :showSubject='showSubject'
+      />
+
+      <div class="container"
+      v-if="user.type === 'admin'"
+      >
+        <Admin :showSettings='showSettings' />
+      </div>
+      <div class="container"
+      v-else
+      >
+        <div class="taskBar"
+        v-if="user.type === 'teacher'"
+        >
+          <div class="taskBarContent"
+          v-for='(group, index) in groups'
+          :key='index'
+          >
+            <h2 class=group_header
+            v-if="user.type === 'teacher' && groups.length >= 1"
+            @click="updateShow(index)"
+            >
+              {{ group.title }}
+            </h2>
+            <div class="groupTasks">
+              <TaskCom
+              v-for='(task, index) in showTask(group.title)'
+              :id='task.id'
+              :key='index'
+              :title="task.title"
+              :description="task.description"
+              :published="task.shown"
+              :task="task"
+              @openPage="openTask(task.id, task)"
+              />
+            </div>
         </div>
         <n-button
         class='addTask'
         @click='createTask()'
         :color='this.style.colors.purple'
         >
-        Добавить задание
+          Добавить задание
         </n-button>
       </div>
-      <div class="taskBar" v-else>
+      <div class="taskBar"
+      v-else
+      >
         <TaskCom
         v-for='(task, index) in showTask(user.group)'
         :id='task.id'
@@ -57,6 +79,7 @@ import TaskCom from '../components/Task.vue'
 import Header from '../components/Header.vue'
 import Admin from '../components/Admin.vue'
 import { useRouter } from 'vue-router'
+
 import config from '@/config'
 
 export default {
@@ -69,6 +92,7 @@ export default {
   data () {
     return {
       showSubject: 'all'
+
     }
   },
   computed: {
@@ -101,6 +125,7 @@ export default {
     // const customError = ref(null)
     const loading = ref(null)
     const tasks = ref(null)
+    // const statistic = ref(null)
     const showSettings = ref('person')
     const subjects = new Set()
     const groupsList = new Set()
@@ -109,8 +134,7 @@ export default {
 
     if (user.value.type !== 'admin') {
       getTasks(serverTasks)
-        .then((response) => {
-          // console.log(serverTasks)
+        .then(() => {
           if (serverTasks.value.length > 0) {
             serverTasks.value.forEach(element => {
               subjects.add(element.subject)
@@ -119,16 +143,16 @@ export default {
           }
           setData('createTasks', serverTasks.value)
           tasks.value = serverTasks.value
+          groupsList.forEach((el) => {
+            const group = {
+              title: el,
+              show: false
+            }
+            groups.value.push(group)
+          })
         })
     }
-
-    groupsList.forEach((el) => {
-      const group = {
-        title: el,
-        show: false
-      }
-      groups.value.push(group)
-    })
+    // createStatistic(statistic)
 
     function setData (place, data) {
       store.commit(place, data)
@@ -137,16 +161,32 @@ export default {
     function createTask () {
       router.push({ name: 'changeTask' })
     }
-
+    function openTask (taskId, task) {
+      router.push({ name: 'task', params: { id: taskId, task: task } })
+    }
     function updateShow (index) {
-      console.log(groups.value[index])
       groups.value[index].show = !groups.value[index].show
     }
+    // function createStatistic (output) {
+    //   // const URL = ''
+    //   // const body = {}
+    //   const allData = ref(null)
+    //   const taskNumber = ref(null)
+    //   getTasks(allData)
+    //   output.value = {
+    //     taskNumber: taskNumber
+    //   }
+    //   // console.log('allData', allData)
+    // }
 
-    async function getTasks (output) {
+    function getTasks (output) {
       const tasksUrl = config.hostname + config.api.getTasks
       loading.value = true
-      return fetch(tasksUrl, {
+      return getFromServerAsync(tasksUrl, output)
+    }
+
+    async function getFromServerAsync (URL, output) {
+      return fetch(URL, {
         method: 'GET',
         mode: 'cors',
         credentials: 'include',
@@ -161,18 +201,13 @@ export default {
           return response.json()
         })
         .then(result => {
-          console.log(result)
+          // console.log(result)
           output.value = result
         })
         .catch((error) => {
           console.error(error)
         })
         .finally(() => { loading.value = false })
-    }
-
-    function openTask (taskId, task) {
-      console.log(taskId)
-      router.push({ name: 'task', params: { id: taskId, task: task } })
     }
 
     return {

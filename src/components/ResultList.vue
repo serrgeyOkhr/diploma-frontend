@@ -42,31 +42,20 @@ export default {
     }
   },
   setup (props) {
-    const rezUrl = config.hostname + config.api.getSolutionByUser
     const taskId = toRef(props, '_taskId')
     const user = toRef(props, 'userId')
     const active = toRef(props, 'activeID')
     const resList = ref(null)
     getResults(taskId.value, resList)
-    // const resList = ref([
-    //   { id: 3, status: 'passed', date: '2022-03-28T13:59:41.102Z' },
-    //   { id: 2, status: 'test_failed', date: '2022-03-28T13:58:41.102Z' },
-    //   { id: 1, status: 'runtime_error', date: '2022-03-28T13:57:41.102Z' }
-    // ])
-    console.log('taskId', taskId.value, ': user', user.value)
-    console.log(resList)
-    // if (isNull(resList.value)) {
-    //   resList.value = false
-    // }
 
-    function getResults (id) {
+    function getResults (id, output) {
+      const URL = config.hostname + config.api.getSolutionByUser
       const body = {
         task_id: id,
         user_id: user.value ? user.value : undefined
       }
-      const resp = ref(null)
 
-      fetch(rezUrl, {
+      fetch(URL, {
         method: 'POST',
         mode: 'cors',
         credentials: 'include',
@@ -77,11 +66,10 @@ export default {
       })
         .then(response => response.json())
         .then(result => {
-          console.log(result)
-          resList.value = result
-          console.log(resList.value)
+          // console.log(result)
+          output.value = result
+          // console.log(output.value)
         })
-      return (resp.value)
     }
 
     return {

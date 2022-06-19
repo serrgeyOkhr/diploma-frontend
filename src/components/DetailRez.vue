@@ -48,10 +48,9 @@ export default {
     const result = ref(null)
     const rawRez = ref(null)
     if (!isNull(resultID.value)) {
-      console.log('я тут', resultID.value)
+      // console.log('я тут', resultID.value)
       getResult(resultID, rawRez)
     }
-    // const result = getStaticResult(resultID.value.id)
     function getResult (resultID, rawRez) {
       /** ожидаемый return:
       * [
@@ -85,7 +84,7 @@ export default {
       })
         .then(response => response.json())
         .then(result => {
-          console.log('result', result)
+          // console.log('result', result)
           rawRez.value = result
         })
         .catch((error) => {
@@ -93,34 +92,6 @@ export default {
         })
       return toRaw(resp.value)
     }
-    // function getStaticResult (resultID) {
-    //   console.log(resultID)
-    //   const results = ref([
-    //     {
-    //       id: 1,
-    //       failed_test: [[2, 6, 4], [4, -1, 8]],
-    //       output: 'long code',
-    //       code: "print('1')"
-    //     },
-    //     {
-    //       id: 2,
-    //       failed_test: [[2, 6, 4], [4, -1, 8]],
-    //       output: null,
-    //       code: "print('10')"
-    //     },
-    //     {
-    //       id: 3,
-    //       failed_test: null,
-    //       output: null,
-    //       code: "print('69')"
-    //     }
-    //   ])
-    //   if (resultID) {
-    //     return results.value.filter((el) => { return el.id === resultID })
-    //   } else {
-    //     return null
-    //   }
-    // }
 
     return {
       result,

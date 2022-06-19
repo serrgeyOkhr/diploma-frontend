@@ -68,12 +68,12 @@ export default {
       })
         .then(response => response.json())
         .then(result => {
-          console.log(result)
+          // console.log(result)
           output.value = result.examples
         })
     }
 
-    console.log(allTask.value)
+    // console.log(allTask.value)
     return {
       allTask,
       sendTaskDetails,

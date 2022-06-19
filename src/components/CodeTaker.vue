@@ -34,7 +34,7 @@
       <n-space>
         <!-- <n-button @click="getFormVal()">Проверить</n-button> -->
         <n-button :loading="checkLoading" @click="getFormVal('check')">Проверить без сохранения</n-button>
-        <n-button type=primary :loading="sendLoading" @click="getFormVal('send')">Отправить решение</n-button>
+        <n-button v-if="userType !== 'teacher'" type=primary :loading="sendLoading" @click="getFormVal('send')">Отправить решение</n-button>
       </n-space>
     </div>
   </div>
@@ -65,6 +65,10 @@ export default {
     },
     task: {
       type: Object
+    },
+    userType: {
+      type: String,
+      default: undefined
     }
   },
   setup (props) {
@@ -121,6 +125,7 @@ export default {
       }
       checkLoading.value = true
       loading.value = true
+      // console.log(body)
       sendToServer(sendURL, body, checkLoading)
     }
 
@@ -131,7 +136,7 @@ export default {
         code: data.value
       }
       const serverUrl = config.hostname + config.api.submitSolution
-      console.log(body)
+      // console.log(body)
       sendLoading.value = true
       loading.value = true
       sendToServer(serverUrl, body, sendLoading)
@@ -148,11 +153,11 @@ export default {
         body: JSON.stringify(body)
       })
         .then(response => {
-          console.log(response)
+          // console.log(response)
           return response
         })
         .then((result) => {
-          console.log('Ответ пришел!')
+          // console.log('Ответ пришел!')
           resp.value = result
           loader.value = false
           loading.value = false

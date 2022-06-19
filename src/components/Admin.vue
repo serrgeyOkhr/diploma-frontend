@@ -18,7 +18,9 @@
     </div>
   </div>
   <div class="containerAdmin" v-else>
-      <CreateTaskSub />
+      <!-- <div class="addForm"> -->
+        <CreateTaskSub />
+      <!-- </div> -->
   </div>
 </template>
 
@@ -53,6 +55,7 @@ export default {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  margin-top: 5px;
 }
 .title_selector {
   display: flex;
