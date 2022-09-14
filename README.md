@@ -1,4 +1,4 @@
-# diploma-frontend
+# Сервис по проверке кода студентов
 
 ## Project setup
 ```
